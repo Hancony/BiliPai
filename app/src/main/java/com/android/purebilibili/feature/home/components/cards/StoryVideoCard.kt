@@ -202,7 +202,8 @@ fun StoryVideoCard(
         resolveHomeCardEnterAnimationEnabledAtMount(
             baseAnimationEnabled = animationEnabled,
             isReturningFromDetail = CardPositionManager.isReturningFromDetail,
-            isSwitchingCategory = CardPositionManager.isSwitchingCategory
+            isSwitchingCategory = CardPositionManager.isSwitchingCategory,
+            isSharedTransitionEnabled = coverSharedEnabled
         )
     }
 

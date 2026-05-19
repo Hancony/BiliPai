@@ -174,7 +174,8 @@ fun GlassVideoCard(
     }
     
     //  卡片容器 - 支持共享元素过渡（受开关控制）
-    val cardModifier = if (transitionEnabled && sharedTransitionScope != null && animatedVisibilityScope != null) {
+    val coverSharedEnabled = transitionEnabled && sharedTransitionScope != null && animatedVisibilityScope != null
+    val cardModifier = if (coverSharedEnabled) {
         with(sharedTransitionScope) {
             Modifier
                 .sharedBounds(
@@ -193,7 +194,8 @@ fun GlassVideoCard(
         resolveHomeCardEnterAnimationEnabledAtMount(
             baseAnimationEnabled = animationEnabled,
             isReturningFromDetail = CardPositionManager.isReturningFromDetail,
-            isSwitchingCategory = CardPositionManager.isSwitchingCategory
+            isSwitchingCategory = CardPositionManager.isSwitchingCategory,
+            isSharedTransitionEnabled = coverSharedEnabled
         )
     }
 
