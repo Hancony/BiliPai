@@ -15,6 +15,7 @@ import com.android.purebilibili.feature.video.ui.overlay.FullscreenDoubleTapActi
 import com.android.purebilibili.feature.video.ui.overlay.VideoPlayerOverlay
 import com.android.purebilibili.feature.video.ui.overlay.SubtitleControlCallbacks
 import com.android.purebilibili.feature.video.ui.overlay.SubtitleControlUiState
+import com.android.purebilibili.feature.video.ui.overlay.nextFullscreenSeekFeedbackEvent
 import com.android.purebilibili.feature.video.ui.overlay.resolveFullscreenDoubleTapAction
 import com.android.purebilibili.feature.video.ui.overlay.resolveBottomControlBarLayoutPolicy
 import com.android.purebilibili.feature.video.ui.overlay.resolveVideoProgressBarLayoutPolicy
@@ -514,6 +515,7 @@ fun VideoPlayerSection(
     //  [新增] 双击跳转视觉反馈状态
     var seekFeedbackText by remember { mutableStateOf<String?>(null) }
     var seekFeedbackVisible by remember { mutableStateOf(false) }
+    var seekFeedbackGeneration by remember { mutableLongStateOf(0L) }
     
     //  [新增] 长按倍速设置和状态
     val longPressSpeed = playerInteractionSettings.longPressSpeed
@@ -1683,7 +1685,12 @@ fun VideoPlayerSection(
                                     durationMs = player.duration
                                 )
                                 commitExplicitSeek(newPos)
-                                seekFeedbackText = "+${seekForwardSeconds}s"
+                                val feedback = nextFullscreenSeekFeedbackEvent(
+                                    previousGeneration = seekFeedbackGeneration,
+                                    deltaSeconds = seekForwardSeconds
+                                )
+                                seekFeedbackGeneration = feedback.generation
+                                seekFeedbackText = feedback.text
                                 seekFeedbackVisible = true
                                 com.android.purebilibili.core.util.Logger.d("VideoPlayerSection") {
                                     "⏩ DoubleTap right: +${seekForwardSeconds}s"
@@ -1697,7 +1704,12 @@ fun VideoPlayerSection(
                                     durationMs = player.duration
                                 )
                                 commitExplicitSeek(newPos)
-                                seekFeedbackText = "-${seekBackwardSeconds}s"
+                                val feedback = nextFullscreenSeekFeedbackEvent(
+                                    previousGeneration = seekFeedbackGeneration,
+                                    deltaSeconds = -seekBackwardSeconds
+                                )
+                                seekFeedbackGeneration = feedback.generation
+                                seekFeedbackText = feedback.text
                                 seekFeedbackVisible = true
                                 com.android.purebilibili.core.util.Logger.d("VideoPlayerSection") {
                                     "⏪ DoubleTap left: -${seekBackwardSeconds}s"
@@ -3279,8 +3291,8 @@ fun VideoPlayerSection(
         }
         
         //  [新增] 双击跳转视觉反馈 (±Ns 提示)
-        LaunchedEffect(seekFeedbackVisible) {
-            if (seekFeedbackVisible) {
+        LaunchedEffect(seekFeedbackGeneration) {
+            if (seekFeedbackGeneration > 0L) {
                 kotlinx.coroutines.delay(800)
                 seekFeedbackVisible = false
             }
