@@ -591,13 +591,12 @@ fun AppNavigation(
             if (!canNavigate(false)) return
             val parsedKey = legacyRouteToBiliPaiNavKey(route)
             val videoBvid = (parsedKey as? BiliPaiNavKey.VideoDetail)?.bvid.orEmpty()
-            val normalizedCurrentVideoCardRoute = navigation3BackStack.lastOrNull()
-                ?.toLegacyRoute()
-                ?.substringBefore("?")
-            val matchedVisibleCardRoute = normalizedCurrentVideoCardRoute
-                ?.takeIf { routeKey ->
-                    CardPositionManager.lastClickedVideoSourceKey == "$routeKey:$videoBvid"
-                }
+            val matchedVisibleCardRoute = resolveVideoCardSourceRouteForNavigation(
+                currentRoute = navigation3BackStack.lastOrNull()?.toLegacyRoute(),
+                videoBvid = videoBvid,
+                lastClickedVideoSourceKey = CardPositionManager.lastClickedVideoSourceKey,
+                visibleBottomBarRoutes = visibleBottomBarRoutes
+            )
             val source = resolveBiliPaiVideoSource(
                 bvid = videoBvid,
                 explicitSourceRoute = sourceRoute ?: matchedVisibleCardRoute,
