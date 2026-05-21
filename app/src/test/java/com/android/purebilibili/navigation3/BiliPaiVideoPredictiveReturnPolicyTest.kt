@@ -9,19 +9,23 @@ import kotlin.test.assertTrue
 class BiliPaiVideoPredictiveReturnPolicyTest {
 
     @Test
-    fun homeVideoWithSharedSourceAndPredictiveGesture_enablesCardRecycle() {
-        assertTrue(
+    fun sharedElementReturnDoesNotEnablePredictiveCardRecycle() {
+        val sourceMetadata = BiliPaiNavSourceMetadata(
+            sourceKey = "home:BV1",
+            sourceRoute = "home",
+            clickedBoundsRecorded = true,
+            cardFullyVisible = true
+        )
+        val sourceBounds = Rect(24f, 360f, 360f, 610f)
+
+        assertFalse(
             shouldEnableVideoPredictiveReturnToCard(
                 currentKey = BiliPaiNavKey.VideoDetail("BV1", sourceRoute = "home"),
                 previousKey = BiliPaiNavKey.Home,
                 predictiveBackAnimationStyle = PredictiveBackAnimationStyle.AOSP,
-                sourceMetadata = BiliPaiNavSourceMetadata(
-                    sourceKey = "home:BV1",
-                    sourceRoute = "home",
-                    clickedBoundsRecorded = true,
-                    cardFullyVisible = true
-                ),
-                sourceBounds = Rect(24f, 360f, 360f, 610f)
+                cardTransitionEnabled = true,
+                sourceMetadata = sourceMetadata,
+                sourceBounds = sourceBounds
             )
         )
     }
@@ -35,6 +39,7 @@ class BiliPaiVideoPredictiveReturnPolicyTest {
                 currentKey = BiliPaiNavKey.VideoDetail("BV2", sourceRoute = "home"),
                 previousKey = BiliPaiNavKey.Home,
                 predictiveBackAnimationStyle = PredictiveBackAnimationStyle.AOSP,
+                cardTransitionEnabled = true,
                 sourceMetadata = BiliPaiNavSourceMetadata(
                     sourceKey = "home:BV1",
                     sourceRoute = "home",
@@ -49,6 +54,7 @@ class BiliPaiVideoPredictiveReturnPolicyTest {
                 currentKey = BiliPaiNavKey.VideoDetail("BV1", sourceRoute = "history"),
                 previousKey = BiliPaiNavKey.History,
                 predictiveBackAnimationStyle = PredictiveBackAnimationStyle.AOSP,
+                cardTransitionEnabled = true,
                 sourceMetadata = BiliPaiNavSourceMetadata(
                     sourceKey = "history:BV1",
                     sourceRoute = "history",
@@ -75,6 +81,7 @@ class BiliPaiVideoPredictiveReturnPolicyTest {
                 currentKey = BiliPaiNavKey.VideoDetail("BV1", sourceRoute = "home"),
                 previousKey = BiliPaiNavKey.Home,
                 predictiveBackAnimationStyle = PredictiveBackAnimationStyle.NONE,
+                cardTransitionEnabled = true,
                 sourceMetadata = sourceMetadata,
                 sourceBounds = sourceBounds
             )
@@ -82,7 +89,7 @@ class BiliPaiVideoPredictiveReturnPolicyTest {
     }
 
     @Test
-    fun disabledSharedElementTransitionStillAllowsPredictiveCardRecycle() {
+    fun disabledSharedElementTransitionDisablesPredictiveCardRecycle() {
         val sourceMetadata = BiliPaiNavSourceMetadata(
             sourceKey = "home:BV1",
             sourceRoute = "home",
@@ -90,11 +97,12 @@ class BiliPaiVideoPredictiveReturnPolicyTest {
             cardFullyVisible = true
         )
 
-        assertTrue(
+        assertFalse(
             shouldEnableVideoPredictiveReturnToCard(
                 currentKey = BiliPaiNavKey.VideoDetail("BV1", sourceRoute = "home"),
                 previousKey = BiliPaiNavKey.Home,
                 predictiveBackAnimationStyle = PredictiveBackAnimationStyle.AOSP,
+                cardTransitionEnabled = false,
                 sourceMetadata = sourceMetadata,
                 sourceBounds = Rect(24f, 360f, 360f, 610f)
             )

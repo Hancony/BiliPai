@@ -59,9 +59,10 @@ internal fun BiliPaiNavDisplayHost(
     val navigationScope = rememberCoroutineScope()
     val predictiveBackMotion = rememberBiliPaiPredictiveBackMotion(predictiveBackAnimationStyle)
     var navigationEventState: NavigationEventState<SceneInfo<BiliPaiNavKey>>? = null
-    val predictivePopRouteTransition = remember(motionMode, sourceMetadata, safeBackStack) {
+    val predictivePopRouteTransition = remember(motionMode, cardTransitionEnabled, sourceMetadata, safeBackStack) {
         resolveBiliPaiNavDisplayPredictivePopRouteTransition(
             motionMode = motionMode,
+            cardTransitionEnabled = cardTransitionEnabled,
             sourceMetadata = sourceMetadata,
             fromKey = safeBackStack.lastOrNull(),
             toKey = safeBackStack.getOrNull(safeBackStack.lastIndex - 1)

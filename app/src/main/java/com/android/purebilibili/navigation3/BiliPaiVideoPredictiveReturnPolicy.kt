@@ -24,17 +24,11 @@ internal fun shouldEnableVideoPredictiveReturnToCard(
     currentKey: BiliPaiNavKey?,
     previousKey: BiliPaiNavKey?,
     predictiveBackAnimationStyle: PredictiveBackAnimationStyle,
+    cardTransitionEnabled: Boolean,
     sourceMetadata: BiliPaiNavSourceMetadata,
     sourceBounds: Rect?
 ): Boolean {
-    val videoKey = currentKey as? BiliPaiNavKey.VideoDetail ?: return false
-    val normalizedSourceRoute = sourceMetadata.sourceRoute?.substringBefore("?")
-    val normalizedVideoSourceRoute = videoKey.sourceRoute?.substringBefore("?")
-    return predictiveBackAnimationStyle.usesPredictiveBack &&
-        previousKey == BiliPaiNavKey.Home &&
-        normalizedSourceRoute == "home" &&
-        normalizedVideoSourceRoute == "home" &&
-        sourceMetadata.sharedTransitionReady &&
-        sourceMetadata.sourceKey == "home:${videoKey.bvid}" &&
-        sourceBounds != null
+    // 共享元素开启时由 sharedBounds 接管；关闭时由方向 fallback 接管。
+    // 不再启用详情壳卡片回收 transform，避免与两条返回路径叠加导致闪屏。
+    return false
 }

@@ -109,6 +109,7 @@ internal fun resolveBiliPaiBackGestureDecision(
     )
     val routeTransition = resolveBiliPaiNavDisplayPredictivePopRouteTransition(
         motionMode = motionMode,
+        cardTransitionEnabled = cardTransitionEnabled,
         sourceMetadata = sourceMetadata,
         fromKey = currentKey,
         toKey = previousKey
@@ -142,6 +143,7 @@ internal fun resolveBiliPaiBackGestureDecision(
 
 internal fun resolveBiliPaiNavDisplayPredictivePopRouteTransition(
     motionMode: BiliPaiNavMotionMode,
+    cardTransitionEnabled: Boolean = true,
     sourceMetadata: BiliPaiNavSourceMetadata,
     fromKey: BiliPaiNavKey?,
     toKey: BiliPaiNavKey?
@@ -157,8 +159,13 @@ internal fun resolveBiliPaiNavDisplayPredictivePopRouteTransition(
         sourceMatchesCurrentVideo &&
         toKey != null &&
         isCardReturnTargetNavKey(toKey)
-    if (sharedReadyVideoToSourceCard) {
+    if (cardTransitionEnabled && sharedReadyVideoToSourceCard) {
         return BiliPaiNavRouteTransition.NO_OP_SHARED_ELEMENT
+    }
+    if (!cardTransitionEnabled && sharedReadyVideoToSourceCard) {
+        resolveCardDisabledPredictiveReturnTransition(sourceMetadata.cardSourceDirection)?.let {
+            return it
+        }
     }
     return if (shouldUseNavigation3PredictivePop(motionMode)) {
         BiliPaiNavRouteTransition.NAV_DISPLAY_DEFAULT_PREDICTIVE
@@ -177,4 +184,27 @@ internal fun shouldInterceptSystemBackForNavigation3(
 
 internal fun shouldUseNavigation3PredictivePop(mode: BiliPaiNavMotionMode): Boolean {
     return mode == BiliPaiNavMotionMode.PREDICTIVE_NAV_DISPLAY
+}
+
+internal fun shouldSuppressPredictiveBackDecoratorForRouteTransition(
+    routeTransition: BiliPaiNavRouteTransition
+): Boolean {
+    return when (routeTransition) {
+        BiliPaiNavRouteTransition.NO_OP_SHARED_ELEMENT,
+        BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_LEFT,
+        BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_RIGHT -> true
+        else -> false
+    }
+}
+
+private fun resolveCardDisabledPredictiveReturnTransition(
+    sourceDirection: BiliPaiNavCardSourceDirection
+): BiliPaiNavRouteTransition? {
+    return when (sourceDirection) {
+        BiliPaiNavCardSourceDirection.SOURCE_LEFT ->
+            BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_LEFT
+        BiliPaiNavCardSourceDirection.SOURCE_RIGHT ->
+            BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_RIGHT
+        BiliPaiNavCardSourceDirection.NONE -> null
+    }
 }

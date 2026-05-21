@@ -141,6 +141,7 @@ import com.android.purebilibili.navigation3.resolveBiliPaiVideoSource
 import com.android.purebilibili.navigation3.resolveInitialBiliPaiBackStack
 import com.android.purebilibili.navigation3.shouldUseNavigation3PredictivePop
 import com.android.purebilibili.navigation3.shouldEnableVideoPredictiveReturnToCard
+import com.android.purebilibili.navigation3.shouldSuppressPredictiveBackDecoratorForRouteTransition
 import com.android.purebilibili.navigation3.toLegacyRoute
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier // 确保 Modifier 被导入
@@ -691,6 +692,7 @@ fun AppNavigation(
             currentNavigation3Key,
             previousNavigation3Key,
             predictiveBackAnimationStyle,
+            cardTransitionEnabled,
             navigation3SourceMetadata,
             CardPositionManager.lastClickedCardBounds
         ) {
@@ -698,6 +700,7 @@ fun AppNavigation(
                 currentKey = currentNavigation3Key,
                 previousKey = previousNavigation3Key,
                 predictiveBackAnimationStyle = predictiveBackAnimationStyle,
+                cardTransitionEnabled = cardTransitionEnabled,
                 sourceMetadata = navigation3SourceMetadata,
                 sourceBounds = CardPositionManager.lastClickedCardBounds
             )
@@ -2139,7 +2142,9 @@ fun AppNavigation(
                     modifier = Modifier.fillMaxSize(),
                     sharedTransitionScope = LocalSharedTransitionScope.current,
                     visibleBottomBarRoutes = visibleBottomBarRoutes,
-                    suppressPredictiveBackDecorator = videoPredictiveReturnToCardEnabled,
+                    suppressPredictiveBackDecorator = shouldSuppressPredictiveBackDecoratorForRouteTransition(
+                        backGestureDecision.routeTransition
+                    ) || videoPredictiveReturnToCardEnabled,
                     videoPredictiveReturnToCardEnabled = videoPredictiveReturnToCardEnabled,
                     videoPredictiveReturnSourceBounds = CardPositionManager.lastClickedCardBounds
                 ) { key ->

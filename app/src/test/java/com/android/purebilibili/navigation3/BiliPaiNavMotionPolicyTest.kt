@@ -179,6 +179,7 @@ class BiliPaiNavMotionPolicyTest {
     fun navDisplayPredictivePop_sharedReadyVideoReturn_keepsRouteLayerNoOp() {
         val transition = resolveBiliPaiNavDisplayPredictivePopRouteTransition(
             motionMode = BiliPaiNavMotionMode.PREDICTIVE_NAV_DISPLAY,
+            cardTransitionEnabled = true,
             sourceMetadata = BiliPaiNavSourceMetadata(
                 sourceKey = "history:BV1",
                 sourceRoute = "history",
@@ -190,6 +191,49 @@ class BiliPaiNavMotionPolicyTest {
         )
 
         assertEquals(BiliPaiNavRouteTransition.NO_OP_SHARED_ELEMENT, transition)
+    }
+
+    @Test
+    fun navDisplayPredictivePop_disabledSharedTransition_usesDirectionalReturnFallback() {
+        val transition = resolveBiliPaiNavDisplayPredictivePopRouteTransition(
+            motionMode = BiliPaiNavMotionMode.PREDICTIVE_NAV_DISPLAY,
+            cardTransitionEnabled = false,
+            sourceMetadata = BiliPaiNavSourceMetadata(
+                sourceKey = "home:BV1",
+                sourceRoute = "home",
+                clickedBoundsRecorded = true,
+                cardFullyVisible = true,
+                cardSourceDirection = BiliPaiNavCardSourceDirection.SOURCE_LEFT
+            ),
+            fromKey = BiliPaiNavKey.VideoDetail("BV1", sourceRoute = "home"),
+            toKey = BiliPaiNavKey.Home
+        )
+
+        assertEquals(BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_LEFT, transition)
+    }
+
+    @Test
+    fun directionalReturnFallbackSuppressesPredictiveDecorator() {
+        assertTrue(
+            shouldSuppressPredictiveBackDecoratorForRouteTransition(
+                BiliPaiNavRouteTransition.NO_OP_SHARED_ELEMENT
+            )
+        )
+        assertTrue(
+            shouldSuppressPredictiveBackDecoratorForRouteTransition(
+                BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_LEFT
+            )
+        )
+        assertTrue(
+            shouldSuppressPredictiveBackDecoratorForRouteTransition(
+                BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_RIGHT
+            )
+        )
+        assertFalse(
+            shouldSuppressPredictiveBackDecoratorForRouteTransition(
+                BiliPaiNavRouteTransition.NAV_DISPLAY_DEFAULT_PREDICTIVE
+            )
+        )
     }
 
     @Test
@@ -247,6 +291,7 @@ class BiliPaiNavMotionPolicyTest {
     fun navDisplayPredictivePop_withoutSharedReady_usesNavDisplayDefaultPredictivePop() {
         val transition = resolveBiliPaiNavDisplayPredictivePopRouteTransition(
             motionMode = BiliPaiNavMotionMode.PREDICTIVE_NAV_DISPLAY,
+            cardTransitionEnabled = true,
             sourceMetadata = BiliPaiNavSourceMetadata(
                 sourceKey = "history:BV1",
                 sourceRoute = "history",
@@ -264,6 +309,7 @@ class BiliPaiNavMotionPolicyTest {
     fun navDisplayPredictivePop_withStaleVideoSource_usesNavDisplayDefaultPredictivePop() {
         val transition = resolveBiliPaiNavDisplayPredictivePopRouteTransition(
             motionMode = BiliPaiNavMotionMode.PREDICTIVE_NAV_DISPLAY,
+            cardTransitionEnabled = true,
             sourceMetadata = BiliPaiNavSourceMetadata(
                 sourceKey = "history:BV1",
                 sourceRoute = "history",
