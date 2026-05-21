@@ -5,6 +5,8 @@ import com.android.purebilibili.navigation.AppSystemBackAction
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class BiliPaiNavMotionPolicyTest {
@@ -213,6 +215,39 @@ class BiliPaiNavMotionPolicyTest {
     }
 
     @Test
+    fun navDisplayPop_disabledSharedTransition_supportsHistoryAndFavoriteCardSources() {
+        val historyTransition = resolveBiliPaiNavDisplayPredictivePopRouteTransition(
+            motionMode = BiliPaiNavMotionMode.CARD_DISABLED,
+            cardTransitionEnabled = false,
+            sourceMetadata = BiliPaiNavSourceMetadata(
+                sourceKey = "history:BV1",
+                sourceRoute = "history",
+                clickedBoundsRecorded = true,
+                cardFullyVisible = true,
+                cardSourceDirection = BiliPaiNavCardSourceDirection.SOURCE_LEFT
+            ),
+            fromKey = BiliPaiNavKey.VideoDetail("BV1", sourceRoute = "history"),
+            toKey = BiliPaiNavKey.History
+        )
+        val favoriteTransition = resolveBiliPaiNavDisplayPredictivePopRouteTransition(
+            motionMode = BiliPaiNavMotionMode.CARD_DISABLED,
+            cardTransitionEnabled = false,
+            sourceMetadata = BiliPaiNavSourceMetadata(
+                sourceKey = "favorite:BV2",
+                sourceRoute = "favorite",
+                clickedBoundsRecorded = true,
+                cardFullyVisible = true,
+                cardSourceDirection = BiliPaiNavCardSourceDirection.SOURCE_RIGHT
+            ),
+            fromKey = BiliPaiNavKey.VideoDetail("BV2", sourceRoute = "favorite"),
+            toKey = BiliPaiNavKey.Favorite
+        )
+
+        assertEquals(BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_LEFT, historyTransition)
+        assertEquals(BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_RIGHT, favoriteTransition)
+    }
+
+    @Test
     fun directionalReturnFallbackSuppressesPredictiveDecorator() {
         assertTrue(
             shouldSuppressPredictiveBackDecoratorForRouteTransition(
@@ -233,6 +268,29 @@ class BiliPaiNavMotionPolicyTest {
             shouldSuppressPredictiveBackDecoratorForRouteTransition(
                 BiliPaiNavRouteTransition.NAV_DISPLAY_DEFAULT_PREDICTIVE
             )
+        )
+    }
+
+    @Test
+    fun plainPopOverridesOnlySharedOrDirectionalVideoReturnTransitions() {
+        assertNotNull(
+            resolveBiliPaiNavPopContentTransform(BiliPaiNavRouteTransition.NO_OP_SHARED_ELEMENT)
+        )
+        assertNotNull(
+            resolveBiliPaiNavPopContentTransform(
+                BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_LEFT
+            )
+        )
+        assertNotNull(
+            resolveBiliPaiNavPopContentTransform(
+                BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_RIGHT
+            )
+        )
+        assertNull(
+            resolveBiliPaiNavPopContentTransform(BiliPaiNavRouteTransition.NAV_DISPLAY_DEFAULT_PREDICTIVE)
+        )
+        assertNull(
+            resolveBiliPaiNavPopContentTransform(BiliPaiNavRouteTransition.FALLBACK)
         )
     }
 

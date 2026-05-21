@@ -42,6 +42,15 @@ class AppNavigationNavigation3BridgeStructureTest {
     }
 
     @Test
+    fun sharedElementDisabledDoesNotExposeVideoReturnSharedReadyState() {
+        val source = appNavigationSource()
+
+        assertTrue(source.contains("sharedTransitionReady = cardTransitionEnabled &&"))
+        assertTrue(source.contains("if (cardTransitionEnabled) {"))
+        assertTrue(source.contains("navigation3ReturnSession.markReturning(SystemClock.uptimeMillis())"))
+    }
+
+    @Test
     fun classicBackMarksVideoReturnBeforePoppingNavigation3Stack() {
         val source = appNavigationSource()
 

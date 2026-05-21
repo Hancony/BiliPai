@@ -56,6 +56,18 @@ internal fun resolveBiliPaiNavPredictivePopContentTransform(
     }
 }
 
+internal fun resolveBiliPaiNavPopContentTransform(
+    routeTransition: BiliPaiNavRouteTransition
+): ContentTransform? {
+    return when (routeTransition) {
+        BiliPaiNavRouteTransition.NO_OP_SHARED_ELEMENT,
+        BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_LEFT,
+        BiliPaiNavRouteTransition.CARD_DISABLED_VIDEO_RETURN_TO_RIGHT ->
+            resolveBiliPaiNavContentTransform(routeTransition)
+        else -> null
+    }
+}
+
 private fun disabledVideoDirectionForwardTransform(directionSign: Int): ContentTransform {
     return (
         slideInHorizontally(

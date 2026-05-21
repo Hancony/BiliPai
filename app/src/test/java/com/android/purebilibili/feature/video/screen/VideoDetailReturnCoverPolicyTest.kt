@@ -43,6 +43,18 @@ class VideoDetailReturnCoverPolicyTest {
     }
 
     @Test
+    fun `force cover stays disabled when shared transition is disabled`() {
+        assertFalse(
+            resolveForceCoverOnlyForReturn(
+                forceCoverOnlyOnReturn = true,
+                isReturningFromDetail = true,
+                isExitTransitionInProgress = false,
+                transitionEnabled = false
+            )
+        )
+    }
+
+    @Test
     fun `force cover stays disabled when only exit transition is in progress`() {
         assertFalse(
             resolveForceCoverOnlyForReturn(

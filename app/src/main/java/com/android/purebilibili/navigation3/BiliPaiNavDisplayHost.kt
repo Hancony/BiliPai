@@ -59,7 +59,7 @@ internal fun BiliPaiNavDisplayHost(
     val navigationScope = rememberCoroutineScope()
     val predictiveBackMotion = rememberBiliPaiPredictiveBackMotion(predictiveBackAnimationStyle)
     var navigationEventState: NavigationEventState<SceneInfo<BiliPaiNavKey>>? = null
-    val predictivePopRouteTransition = remember(motionMode, cardTransitionEnabled, sourceMetadata, safeBackStack) {
+    val popRouteTransition = remember(motionMode, cardTransitionEnabled, sourceMetadata, safeBackStack) {
         resolveBiliPaiNavDisplayPredictivePopRouteTransition(
             motionMode = motionMode,
             cardTransitionEnabled = cardTransitionEnabled,
@@ -68,6 +68,7 @@ internal fun BiliPaiNavDisplayHost(
             toKey = safeBackStack.getOrNull(safeBackStack.lastIndex - 1)
         )
     }
+    val predictivePopRouteTransition = popRouteTransition
     val scopedContent: @Composable (BiliPaiNavKey) -> Unit = remember(content, application) {
         { key ->
             ProvideAnimatedVisibilityScope(
@@ -179,9 +180,10 @@ internal fun BiliPaiNavDisplayHost(
                 resolveBiliPaiNavContentTransform(BiliPaiNavRouteTransition.FALLBACK)
             },
             popTransitionSpec = {
-                with(predictiveBackMotion) {
-                    onPopTransitionSpec()
-                }
+                resolveBiliPaiNavPopContentTransform(popRouteTransition)
+                    ?: with(predictiveBackMotion) {
+                        onPopTransitionSpec()
+                    }
             },
             predictivePopTransitionSpec = { swipeEdge ->
                 // 预测性返回必须由顶层统一分发，否则普通路由的 entry fallback 会抢走

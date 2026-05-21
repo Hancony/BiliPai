@@ -253,8 +253,10 @@ internal fun resolveForceCoverOnlyForReturn(
     forceCoverOnlyOnReturn: Boolean,
     isReturningFromDetail: Boolean,
     isExitTransitionInProgress: Boolean,
+    transitionEnabled: Boolean = true,
     detailShellSharedBoundsEnabled: Boolean = false
 ): Boolean {
+    if (!transitionEnabled) return false
     if (detailShellSharedBoundsEnabled) return false
     return forceCoverOnlyOnReturn || isReturningFromDetail
 }
@@ -1510,6 +1512,7 @@ fun VideoDetailScreen(
         forceCoverOnlyOnReturn = forceCoverOnlyOnReturn,
         isReturningFromDetail = isReturningFromDetail,
         isExitTransitionInProgress = isExitTransitionInProgress,
+        transitionEnabled = transitionEnabled,
         detailShellSharedBoundsEnabled = detailShellSharedBoundsEnabled
     )
 

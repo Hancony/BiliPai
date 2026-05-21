@@ -77,6 +77,15 @@ class BiliPaiNavDisplayHostStructureTest {
         assertFalse(source.contains("LaunchedEffect(predictiveBackGestureState)"))
     }
 
+    @Test
+    fun navDisplayHostRoutesPlainPopThroughRouteTransitionPolicyBeforeDefaultMotion() {
+        val source = navDisplayHostSource()
+
+        assertTrue(source.contains("val popRouteTransition = remember("))
+        assertTrue(source.contains("resolveBiliPaiNavPopContentTransform(popRouteTransition)"))
+        assertTrue(source.contains("?: with(predictiveBackMotion)"))
+    }
+
     private fun navDisplayHostSource(): String {
         return listOf(
             File("app/src/main/java/com/android/purebilibili/navigation3/BiliPaiNavDisplayHost.kt"),
