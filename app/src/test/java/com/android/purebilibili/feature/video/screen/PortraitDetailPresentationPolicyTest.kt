@@ -75,6 +75,20 @@ class PortraitDetailPresentationPolicyTest {
     }
 
     @Test
+    fun inlinePortraitPlayerLayout_keepsFoldableInnerScreenDetailReachable() {
+        val spec = resolvePortraitInlinePlayerLayoutSpec(
+            screenWidthDp = 768f,
+            screenHeightDp = 1024f,
+            isCollapsed = false
+        )
+
+        assertEquals(768f, spec.widthDp)
+        assertEquals(532.48f, spec.heightDp, absoluteTolerance = 0.01f)
+        assertTrue(spec.heightDp < spec.widthDp)
+        assertTrue(spec.heightDp < 1024f * 0.6f)
+    }
+
+    @Test
     fun inlinePortraitPlayerLayout_collapsesToFullWidth16By9Header() {
         val expanded = resolvePortraitInlinePlayerLayoutSpec(
             screenWidthDp = 412f,

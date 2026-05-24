@@ -689,6 +689,23 @@ class VideoDetailLayoutModePolicyTest {
     }
 
     @Test
+    fun autoPortraitRoutePolicy_doesNotEnter_whenWideWindowKeepsDetailContentVisible() {
+        assertFalse(
+            shouldAutoEnterPortraitFullscreenFromRoute(
+                autoEnterPortraitFromRoute = true,
+                startAudioFromRoute = false,
+                portraitExperienceEnabled = true,
+                useOfficialInlinePortraitDetailExperience = false,
+                allowStandalonePortraitAutoEnter = false,
+                isCurrentRouteVideoLoaded = true,
+                isVerticalVideo = true,
+                isPortraitFullscreen = false,
+                hasAutoEnteredPortraitFromRoute = false
+            )
+        )
+    }
+
+    @Test
     fun autoPortraitRoutePolicy_doesNotEnter_whenAudioRoute() {
         assertFalse(
             shouldAutoEnterPortraitFullscreenFromRoute(

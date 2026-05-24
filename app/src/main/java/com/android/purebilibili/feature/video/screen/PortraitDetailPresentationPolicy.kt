@@ -2,6 +2,7 @@ package com.android.purebilibili.feature.video.screen
 
 import com.android.purebilibili.core.store.PortraitPlayerCollapseMode
 import kotlin.math.max
+import kotlin.math.min
 
 internal data class PortraitInlinePlayerLayoutSpec(
     val widthDp: Float,
@@ -146,7 +147,13 @@ internal fun resolvePortraitInlinePlayerLayoutSpec(
         )
     }
 
-    val expandedHeight = max(screenHeightDp * 0.65f, screenWidthDp)
+    val isWidePortraitWindow = screenWidthDp >= 600f && screenHeightDp > screenWidthDp
+    val expandedHeight = if (isWidePortraitWindow) {
+        // 折叠屏内屏竖屏窗口不能按手机竖屏体验撑满首屏，否则详情区入口会被播放器挤出。
+        min(max(screenHeightDp * 0.52f, collapsedHeight), screenWidthDp)
+    } else {
+        max(screenHeightDp * 0.65f, screenWidthDp)
+    }
     return PortraitInlinePlayerLayoutSpec(
         widthDp = width,
         heightDp = expandedHeight

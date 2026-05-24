@@ -735,6 +735,7 @@ internal fun shouldAutoEnterPortraitFullscreenFromRoute(
     startAudioFromRoute: Boolean,
     portraitExperienceEnabled: Boolean,
     useOfficialInlinePortraitDetailExperience: Boolean,
+    allowStandalonePortraitAutoEnter: Boolean = true,
     isCurrentRouteVideoLoaded: Boolean,
     isVerticalVideo: Boolean,
     isPortraitFullscreen: Boolean,
@@ -744,6 +745,7 @@ internal fun shouldAutoEnterPortraitFullscreenFromRoute(
         !startAudioFromRoute &&
         portraitExperienceEnabled &&
         !useOfficialInlinePortraitDetailExperience &&
+        allowStandalonePortraitAutoEnter &&
         isCurrentRouteVideoLoaded &&
         isVerticalVideo &&
         !isPortraitFullscreen &&
@@ -2240,6 +2242,7 @@ fun VideoDetailScreen(
         startAudioFromRoute,
         portraitExperienceEnabled,
         useOfficialInlinePortraitDetailExperience,
+        windowSizeClass.widthSizeClass,
         isCurrentRouteVideoLoaded,
         isVerticalVideo,
         isPortraitFullscreen,
@@ -2251,6 +2254,8 @@ fun VideoDetailScreen(
                 startAudioFromRoute = startAudioFromRoute,
                 portraitExperienceEnabled = portraitExperienceEnabled,
                 useOfficialInlinePortraitDetailExperience = useOfficialInlinePortraitDetailExperience,
+                allowStandalonePortraitAutoEnter = windowSizeClass.widthSizeClass ==
+                    com.android.purebilibili.core.util.WindowWidthSizeClass.Compact,
                 isCurrentRouteVideoLoaded = isCurrentRouteVideoLoaded,
                 isVerticalVideo = isVerticalVideo,
                 isPortraitFullscreen = isPortraitFullscreen,
