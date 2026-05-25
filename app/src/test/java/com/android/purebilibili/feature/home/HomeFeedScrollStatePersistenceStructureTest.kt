@@ -64,8 +64,9 @@ class HomeFeedScrollStatePersistenceStructureTest {
             .substringAfter("HorizontalPager(")
             .substringBefore("// Close HorizontalPager lambda")
 
-        assertTrue(pagerPageSource.contains("onRefresh = { viewModel.refresh(category) }"))
-        assertFalse(pagerPageSource.contains("onRefresh = { viewModel.refresh() }"))
+        assertTrue(pagerPageSource.contains("if (category == HomeCategory.FOLLOW)"))
+        assertTrue(pagerPageSource.contains("viewModel.refresh(category)"))
+        assertTrue(pagerPageSource.contains("viewModel.refresh()"))
     }
 
     @Test
