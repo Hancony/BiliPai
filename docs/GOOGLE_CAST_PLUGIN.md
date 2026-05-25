@@ -2,6 +2,8 @@
 
 This is the single entry point for the BiliPai Google Cast plugin work. Keep it concise, update it after each completed slice, and remove stale details instead of adding parallel notes.
 
+If `docs/GOOGLE_CAST_PLUGIN.local.md` exists, read it after this file for machine-specific environment notes. That local file is intentionally ignored and must not be committed.
+
 ## Working Rules
 
 - Build this as a BiliPai source-level native Kotlin plugin.
@@ -57,6 +59,8 @@ Result on 2026-05-26: passed with `BUILD SUCCESSFUL`.
 
 Goal: add build/manifest wiring, a native plugin class, and small policy tests proving enablement metadata and route visibility behavior.
 
+Status: complete.
+
 Likely files:
 
 - `app/build.gradle.kts`
@@ -64,6 +68,14 @@ Likely files:
 - `app/src/main/java/com/android/purebilibili/app/PureApplication.kt`
 - `app/src/main/java/com/android/purebilibili/feature/plugin/GoogleCastPlugin.kt`
 - New focused tests under `app/src/test/java/com/android/purebilibili/feature/cast/`
+
+Result on 2026-05-26:
+
+- Added the native `GoogleCastPlugin` shell and registered it as an eighth built-in plugin.
+- Added Google Cast CAF and MediaRouter dependencies.
+- Added the Cast options provider manifest metadata and default receiver policy.
+- Verified with `.\gradlew.bat :app:testDebugUnitTest --tests "*GoogleCast*" --no-daemon`.
+- Verified with `.\gradlew.bat :app:testDebugUnitTest --tests "*Cast*" --no-daemon`.
 
 ### Slice 2: Chromecast Discovery And Selection
 
@@ -101,3 +113,4 @@ Verification ladder:
 - 2026-05-26: Created isolated worktree `feature/google-cast-plugin`.
 - 2026-05-26: Confirmed existing casting is DLNA/SSDP based; Google Cast/Chromecast support is not implemented yet.
 - 2026-05-26: Completed Slice 0 documentation and focused Cast baseline.
+- 2026-05-26: Completed Slice 1 Google Cast plugin shell, CAF wiring, and focused policy tests.

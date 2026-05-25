@@ -41,6 +41,7 @@ import com.android.purebilibili.feature.plugin.DanmakuEnhancePlugin
 import com.android.purebilibili.feature.plugin.EyeProtectionPlugin
 import com.android.purebilibili.feature.plugin.HomeFeedAnonymizerPlugin
 import com.android.purebilibili.feature.plugin.SponsorBlockPlugin
+import com.android.purebilibili.feature.plugin.GoogleCastPlugin
 import com.android.purebilibili.feature.plugin.TodayWatchPlugin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -155,7 +156,8 @@ class PureApplication : Application(), ImageLoaderFactory, ComponentCallbacks2 {
         PluginManager.register(TodayWatchPlugin())
         PluginManager.register(CdnRegionPlugin())
         PluginManager.register(HomeFeedAnonymizerPlugin())
-        Logger.d(PureApplicationRuntimeConfig.TAG, " Plugin system initialized with 7 built-in plugins")
+        PluginManager.register(GoogleCastPlugin())
+        Logger.d(PureApplicationRuntimeConfig.TAG, " Plugin system initialized with 8 built-in plugins")
 
         com.android.purebilibili.core.plugin.json.JsonPluginManager.initialize(this)
         Logger.d(PureApplicationRuntimeConfig.TAG, " JSON plugin system initialized")
