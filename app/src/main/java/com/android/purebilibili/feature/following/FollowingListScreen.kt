@@ -46,6 +46,7 @@ import com.android.purebilibili.core.store.FollowingCacheStore
 import com.android.purebilibili.core.ui.AdaptiveScaffold
 import com.android.purebilibili.core.ui.AdaptiveTopAppBar
 import com.android.purebilibili.core.ui.ComfortablePullToRefreshBox
+import com.android.purebilibili.core.ui.OfficialVerifyBadge
 import com.android.purebilibili.core.ui.globalWallpaperAwareBackground
 import com.android.purebilibili.core.ui.rememberAppBackIcon
 import com.android.purebilibili.core.util.FormatUtils
@@ -1264,26 +1265,5 @@ private fun FollowingUserItem(
 private fun FollowingOfficialVerifyBadgeView(
     badge: FollowingOfficialVerifyBadge
 ) {
-    val containerColor = when (badge.tone) {
-        FollowingOfficialVerifyBadgeTone.PERSONAL -> Color(0xFFFFF3CD)
-        FollowingOfficialVerifyBadgeTone.ORGANIZATION -> Color(0xFFDCEBFF)
-    }
-    val contentColor = when (badge.tone) {
-        FollowingOfficialVerifyBadgeTone.PERSONAL -> Color(0xFF7A4B00)
-        FollowingOfficialVerifyBadgeTone.ORGANIZATION -> Color(0xFF174EA6)
-    }
-    Surface(
-        modifier = Modifier.widthIn(max = 120.dp),
-        color = containerColor,
-        contentColor = contentColor,
-        shape = RoundedCornerShape(4.dp)
-    ) {
-        Text(
-            text = badge.text,
-            fontSize = 10.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
-        )
-    }
+    OfficialVerifyBadge(badge = badge)
 }

@@ -1,5 +1,8 @@
 package com.android.purebilibili.feature.following
 
+import com.android.purebilibili.core.ui.OfficialVerifyBadgeSpec
+import com.android.purebilibili.core.ui.OfficialVerifyBadgeTone
+import com.android.purebilibili.core.ui.resolveOfficialVerifyBadge
 import com.android.purebilibili.data.model.response.OfficialVerify
 import java.time.Instant
 import java.time.ZoneId
@@ -7,30 +10,16 @@ import java.time.format.DateTimeFormatter
 
 private val FollowingSinceFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-enum class FollowingOfficialVerifyBadgeTone {
-    PERSONAL,
-    ORGANIZATION
-}
-
-data class FollowingOfficialVerifyBadge(
-    val text: String,
-    val tone: FollowingOfficialVerifyBadgeTone
-)
+typealias FollowingOfficialVerifyBadgeTone = OfficialVerifyBadgeTone
+typealias FollowingOfficialVerifyBadge = OfficialVerifyBadgeSpec
 
 internal fun resolveFollowingOfficialVerifyBadge(
     officialVerify: OfficialVerify
 ): FollowingOfficialVerifyBadge? {
-    return when (officialVerify.type) {
-        0 -> FollowingOfficialVerifyBadge(
-            text = officialVerify.desc.ifBlank { "个人认证" },
-            tone = FollowingOfficialVerifyBadgeTone.PERSONAL
-        )
-        1 -> FollowingOfficialVerifyBadge(
-            text = officialVerify.desc.ifBlank { "机构认证" },
-            tone = FollowingOfficialVerifyBadgeTone.ORGANIZATION
-        )
-        else -> null
-    }
+    return resolveOfficialVerifyBadge(
+        type = officialVerify.type,
+        desc = officialVerify.desc
+    )
 }
 
 internal fun formatFollowingSinceLabel(

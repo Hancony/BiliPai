@@ -74,6 +74,7 @@ import com.android.purebilibili.core.ui.AdaptiveScaffold
 import com.android.purebilibili.core.database.entity.SearchHistory
 import com.android.purebilibili.core.ui.LoadingAnimation
 import com.android.purebilibili.core.ui.LocalGlobalWallpaperBackdropVisible
+import com.android.purebilibili.core.ui.OfficialVerifyBadge
 import com.android.purebilibili.core.ui.globalWallpaperAwareBackground
 import com.android.purebilibili.core.ui.resolveBottomSafeAreaPadding
 import com.android.purebilibili.core.ui.resolveCompactCapsuleChromeSpec
@@ -83,6 +84,7 @@ import com.android.purebilibili.core.ui.rememberAppChevronUpIcon
 import com.android.purebilibili.core.ui.rememberAppClearIcon
 import com.android.purebilibili.core.ui.rememberAppHistoryIcon
 import com.android.purebilibili.core.ui.rememberAppSearchIcon
+import com.android.purebilibili.core.ui.resolveOfficialVerifyBadge
 import com.android.purebilibili.core.ui.components.UpBadgeName
 import com.android.purebilibili.feature.home.components.cards.ElegantVideoCard  //  使用首页卡片
 import com.android.purebilibili.core.store.SettingsManager  //  读取动画设置
@@ -2671,27 +2673,19 @@ internal fun UpSearchResultCard(
                         overflow = TextOverflow.Ellipsis
                     )
                     
-                    // 认证标志
-                    cleanedItem.official_verify?.let { verify ->
-                        when (resolveSearchVerifyBadge(verify.type, verify.desc)) {
-                            SearchVerifyBadge.NONE -> Unit
-                            SearchVerifyBadge.PERSONAL,
-                            SearchVerifyBadge.ORGANIZATION -> {
-                                val isPersonal = resolveSearchVerifyBadge(verify.type, verify.desc) == SearchVerifyBadge.PERSONAL
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Surface(
-                                    color = if (isPersonal) Color(0xFFFFB300) else Color(0xFF2196F3),
-                                    shape = RoundedCornerShape(4.dp)
-                                ) {
-                                    Text(
-                                        text = if (isPersonal) "个人" else "机构",
-                                        fontSize = 10.sp,
-                                        color = Color.White,
-                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
-                                    )
-                                }
-                            }
-                        }
+                    val verifyBadge = cleanedItem.official_verify?.let { verify ->
+                        resolveOfficialVerifyBadge(
+                            type = verify.type,
+                            desc = verify.desc,
+                            compact = true
+                        )
+                    }
+                    if (verifyBadge != null) {
+                        Spacer(modifier = Modifier.width(4.dp))
+                        OfficialVerifyBadge(
+                            badge = verifyBadge,
+                            compact = true
+                        )
                     }
                 }
                 
