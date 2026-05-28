@@ -159,10 +159,10 @@ fun RelatedVideoItem(
             transitionEnabled = transitionEnabled
         )
     }
-    val coverBoundsRef = remember { object { var value: Rect? = null } }
+    val cardBoundsRef = remember { object { var value: Rect? = null } }
 
     val triggerRelatedVideoClick = {
-        coverBoundsRef.value?.let { bounds ->
+        cardBoundsRef.value?.let { bounds ->
             CardPositionManager.recordVideoCardPosition(
                 bvid = video.bvid,
                 sourceRoute = sourceRoute,
@@ -175,16 +175,48 @@ fun RelatedVideoItem(
         onClick()
     }
 
+    val cardShape = RoundedCornerShape(12.dp)
+    val cardShellModifier = if (coverSharedEnabled) {
+        with(sharedTransitionScope) {
+            Modifier.sharedBounds(
+                sharedContentState = rememberSharedContentState(
+                    key = videoCardShellSharedElementKey(
+                        video.bvid,
+                        sourceRoute = sourceRoute
+                    )
+                ),
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = { _, _ ->
+                    if (cardSharedTransitionMotionSpec.enabled) {
+                        tween(
+                            durationMillis = cardSharedTransitionMotionSpec.durationMillis,
+                            easing = cardSharedTransitionMotionSpec.easing
+                        )
+                    } else {
+                        com.android.purebilibili.core.ui.motion.AppMotionTokens.spatialSpec()
+                    }
+                },
+                clipInOverlayDuringTransition = OverlayClip(cardShape)
+            )
+        }
+    } else {
+        Modifier
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp) // Spacing between items
     ) {
         Surface(
-            shape = RoundedCornerShape(12.dp),
+            shape = cardShape,
             color = MaterialTheme.colorScheme.surface,
             modifier = Modifier
                 .fillMaxWidth()
+                .then(cardShellModifier)
+                .onGloballyPositioned { coordinates ->
+                    cardBoundsRef.value = coordinates.boundsInRoot()
+                }
                 .clickable(
                     onClick = triggerRelatedVideoClick
                 )
@@ -195,49 +227,16 @@ fun RelatedVideoItem(
                 .fillMaxWidth()
                 .padding(5.dp) // Internal padding
         ) {
-            // 🔗 [共享元素] 为封面添加共享元素标记
-            val coverModifier = if (coverSharedEnabled) {
-                with(sharedTransitionScope) {
-                    Modifier
-                        .sharedBounds(
-                            sharedContentState = rememberSharedContentState(
-                                key = videoCardShellSharedElementKey(
-                                    video.bvid,
-                                    sourceRoute = sourceRoute
-                                )
-                            ),
-                            animatedVisibilityScope = animatedVisibilityScope,
-                            boundsTransform = { _, _ ->
-                                if (cardSharedTransitionMotionSpec.enabled) {
-                                    tween(
-                                        durationMillis = cardSharedTransitionMotionSpec.durationMillis,
-                                        easing = cardSharedTransitionMotionSpec.easing
-                                    )
-                                } else {
-                                    com.android.purebilibili.core.ui.motion.AppMotionTokens.spatialSpec()
-                                }
-                            },
-                            clipInOverlayDuringTransition = OverlayClip(
-                                RoundedCornerShape(12.dp)
-                            )
-                        )
-                }
-            } else {
-                Modifier
-            }
             val relatedCoverWidth = 130.dp
             val relatedCoverHeight = relatedCoverWidth / VIDEO_SHARED_COVER_ASPECT_RATIO
             
             // Video cover
             Box(
-                modifier = coverModifier
+                modifier = Modifier
                     .width(relatedCoverWidth)
                     .height(relatedCoverHeight)
                     .clip(RoundedCornerShape(12.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .onGloballyPositioned { coordinates ->
-                        coverBoundsRef.value = coordinates.boundsInRoot()
-                    }
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)

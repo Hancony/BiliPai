@@ -1,8 +1,10 @@
 package com.android.purebilibili.feature.video.ui.components
 
+import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class RelatedVideoItemPolicyTest {
 
@@ -53,6 +55,22 @@ class RelatedVideoItemPolicyTest {
         assertEquals("video", resolveRelatedVideoSharedElementSourceRoute(""))
         assertEquals("video", resolveRelatedVideoSharedElementSourceRoute("video?from=related"))
         assertEquals("home", resolveRelatedVideoSharedElementSourceRoute("home"))
+    }
+
+    @Test
+    fun `related card shell shared bounds are owned by the whole card`() {
+        val source = File("src/main/java/com/android/purebilibili/feature/video/ui/components/RelatedVideoItem.kt")
+            .readText()
+        val surfaceBlock = source
+            .substringAfter("Surface(")
+            .substringBefore("val relatedCoverWidth")
+        val coverBlock = source
+            .substringAfter("// Video cover")
+            .substringBefore("AsyncImage(")
+
+        assertTrue(source.contains("val cardShellModifier = if (coverSharedEnabled)"))
+        assertTrue(surfaceBlock.contains(".then(cardShellModifier)"))
+        assertFalse(coverBlock.contains("videoCardShellSharedElementKey("))
     }
 
     @Test
