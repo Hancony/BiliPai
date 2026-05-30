@@ -3290,9 +3290,13 @@ private fun KernelSuAlignedBottomBar(
                 }
 
                 if (shouldRenderIndicatorContentCapture && backdrop != null) {
-                    val rawCaptureWidth = dockWidth + launchAdjustedSearchGap + searchWidth
-                    val captureHorizontalOverscan = rawCaptureWidth *
+                    val rawCaptureWidth = dockWidth
+                    // [折射边缘守卫] tabsBackdrop 只导出底栏 dock 内容。右侧搜索胶囊保持独立绘制,
+                    // 避免最右侧指示器透镜把搜索槽位裁进采样结果;额外 overscan 只提供空白采样缓冲。
+                    val captureEdgeGuard = 48.dp
+                    val captureMotionOverscan = rawCaptureWidth *
                         ((refractionMotionProfile.exportCaptureWidthScale - 1f) / 2f).coerceAtLeast(0f)
+                    val captureHorizontalOverscan = captureMotionOverscan.coerceAtLeast(captureEdgeGuard)
                     val captureWidth = rawCaptureWidth + captureHorizontalOverscan * 2f
                     Box(
                         modifier = Modifier
@@ -3307,7 +3311,9 @@ private fun KernelSuAlignedBottomBar(
                             }
                             .drawBackdrop(
                                 backdrop = backdrop,
-                                shape = { shellShape },
+                                // 捕获层只是给移动指示器采样,不能把加宽后的胶囊圆角也录进去。
+                                // 否则最右侧会折射到捕获层端帽,形成截图里的第二个右边缘。
+                                shape = { androidx.compose.ui.graphics.RectangleShape },
                                 effects = {
                                     if (materialSpec.vibrancy) {
                                         vibrancy()
@@ -3457,45 +3463,6 @@ private fun KernelSuAlignedBottomBar(
                             }
                         }
 
-                        if (searchEnabled) {
-                            Box(
-                                modifier = Modifier
-                                    .offset(x = captureHorizontalOverscan + dockWidth + launchAdjustedSearchGap)
-                                    .width(searchWidth)
-                                    .height(searchHeight)
-                                    .align(Alignment.CenterStart)
-                                    .kernelSuFloatingDockSurface(
-                                        shape = shellShape,
-                                        backdrop = backdrop,
-                                        containerColor = containerColor,
-                                        blurEnabled = blurEnabled,
-                                        glassEnabled = glassEnabled,
-                                        blurRadius = tuning.shellBlurRadiusDp.dp,
-                                        hazeState = hazeState,
-                                        motionTier = motionTier,
-                                        isTransitionRunning = isTransitionRunning,
-                                        forceLowBlurBudget = forceLowBlurBudget,
-                                        liquidGlassPreset = liquidGlassPreset,
-                                        isScrolling = isFeedScrollInProgress,
-                                        materialScrollProgress = materialScrollProgress,
-                                        materialMotionProgress = motionProgress,
-                                        materialPressProgress = effectivePressProgress
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                KernelSuBottomBarSearchVisualContent(
-                                    expanded = effectiveSearchExpanded,
-                                    query = searchQuery,
-                                    onQueryChange = {},
-                                    onSubmit = {},
-                                    contentColor = unselectedColor,
-                                    accentColor = selectedColor,
-                                    iconScale = if (effectiveSearchExpanded) 0.92f else 1f,
-                                    fieldAlpha = if (effectiveSearchExpanded) 1f else 0f,
-                                    interactive = false
-                                )
-                            }
-                        }
                     }
                 }
 

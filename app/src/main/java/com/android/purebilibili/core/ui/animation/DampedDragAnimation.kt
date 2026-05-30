@@ -2,6 +2,7 @@
 package com.android.purebilibili.core.ui.animation
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitHorizontalTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.horizontalDrag
@@ -76,6 +77,16 @@ internal class DampedDragAnimationState(
     
     /** 累计拖拽偏移量 (px) — 用于面板偏移效果 */
     private val offsetAnimation = Animatable(0f)
+
+    /**
+     * 玻璃偏移跟手弹簧：位置仍 snapTo 保证指示器即时滑动,
+     * 折射偏移单独用临界阻尼过滤输入采样抖动。
+     */
+    private val dragFollowSpring = spring<Float>(
+        dampingRatio = 1f,
+        stiffness = 1000f,
+        visibilityThreshold = 0.001f
+    )
     
     /** 当前动画位置 */
     val value: Float get() = animatable.value
@@ -182,15 +193,14 @@ internal class DampedDragAnimationState(
         // 累计偏移量 — 用于面板偏移
         desiredDragOffsetPx += dragAmountPx
 
-        // [P0] 拖拽逐帧只启动一个协程同步位置与偏移：
-        // 合并原先的 positionJob/offsetJob 两次 launch+cancel；
-        // snapTo 自身已抢占 MutatorMutex 并中止在跑动画，无需额外 stop()。
+        // 指示器位置必须即时跟手;玻璃折射偏移单独阻尼,过滤拖拽采样抖动。
         positionJob?.cancel()
         offsetJob?.cancel()
-        offsetJob = null
         positionJob = scope.launch {
             animatable.snapTo(newValue)
-            offsetAnimation.snapTo(desiredDragOffsetPx)
+        }
+        offsetJob = scope.launch {
+            offsetAnimation.animateTo(desiredDragOffsetPx, dragFollowSpring)
         }
     }
 

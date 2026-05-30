@@ -467,14 +467,17 @@ class BottomBarMiuixStructureTest {
         assertTrue(kernelSuRendererSource.contains("if (shouldComposeDockContent) {"))
         assertTrue(kernelSuRendererSource.contains("shouldRenderRefractionCapture || isBottomBarPressActive"))
         assertTrue(kernelSuRendererSource.contains("if (shouldRenderIndicatorContentCapture && backdrop != null) {"))
-        assertTrue(kernelSuRendererSource.contains("val rawCaptureWidth = dockWidth + launchAdjustedSearchGap + searchWidth"))
-        assertTrue(kernelSuRendererSource.contains("val captureHorizontalOverscan = rawCaptureWidth *"))
+        assertTrue(kernelSuRendererSource.contains("val rawCaptureWidth = dockWidth"))
+        assertFalse(kernelSuRendererSource.contains("val rawCaptureWidth = dockWidth + launchAdjustedSearchGap + searchWidth"))
+        assertTrue(kernelSuRendererSource.contains("val captureMotionOverscan = rawCaptureWidth *"))
+        assertTrue(kernelSuRendererSource.contains("val captureHorizontalOverscan = captureMotionOverscan.coerceAtLeast(captureEdgeGuard)"))
         assertTrue(kernelSuRendererSource.contains("val captureWidth = rawCaptureWidth + captureHorizontalOverscan * 2f"))
+        assertTrue(kernelSuRendererSource.contains("shape = { androidx.compose.ui.graphics.RectangleShape }"))
         assertTrue(kernelSuRendererSource.contains(".width(captureWidth)"))
     }
 
     @Test
-    fun `sukisu search capsule participates in the dock aligned refraction capture`() {
+    fun `sukisu search capsule stays outside dock refraction capture`() {
         val source = loadSource("app/src/main/java/com/android/purebilibili/feature/home/components/BottomBar.kt")
         val kernelSuRendererSource = source
             .substringAfter("private fun KernelSuAlignedBottomBar(")
@@ -485,14 +488,16 @@ class BottomBarMiuixStructureTest {
 
         assertFalse(source.contains("private fun KernelSuBottomBarSearchRefractionCapture("))
         assertFalse(kernelSuRendererSource.contains("KernelSuBottomBarSearchRefractionCapture("))
-        assertTrue(refractionCaptureSource.contains("val rawCaptureWidth = dockWidth + launchAdjustedSearchGap + searchWidth"))
-        assertTrue(refractionCaptureSource.contains("val captureHorizontalOverscan = rawCaptureWidth *"))
+        assertTrue(refractionCaptureSource.contains("val rawCaptureWidth = dockWidth"))
+        assertFalse(refractionCaptureSource.contains("val rawCaptureWidth = dockWidth + launchAdjustedSearchGap + searchWidth"))
+        assertTrue(refractionCaptureSource.contains("val captureMotionOverscan = rawCaptureWidth *"))
+        assertTrue(refractionCaptureSource.contains("val captureHorizontalOverscan = captureMotionOverscan.coerceAtLeast(captureEdgeGuard)"))
         assertTrue(refractionCaptureSource.contains("val captureWidth = rawCaptureWidth + captureHorizontalOverscan * 2f"))
+        assertTrue(refractionCaptureSource.contains("shape = { androidx.compose.ui.graphics.RectangleShape }"))
         assertTrue(refractionCaptureSource.contains(".width(captureWidth)"))
         assertTrue(refractionCaptureSource.contains(".layerBackdrop(tabsBackdrop)"))
-        assertTrue(refractionCaptureSource.contains(".offset(x = captureHorizontalOverscan + dockWidth + launchAdjustedSearchGap)"))
-        assertTrue(refractionCaptureSource.contains("KernelSuBottomBarSearchVisualContent("))
-        assertTrue(refractionCaptureSource.contains("interactive = false"))
+        assertFalse(refractionCaptureSource.contains(".offset(x = captureHorizontalOverscan + dockWidth + launchAdjustedSearchGap)"))
+        assertFalse(refractionCaptureSource.contains("KernelSuBottomBarSearchVisualContent("))
     }
 
     @Test
