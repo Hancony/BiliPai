@@ -3784,7 +3784,6 @@ internal fun BoxScope.KernelSuBottomBarIndicatorLayer(
     indicatorLayerScaleTransform: BottomBarIndicatorLayerTransform? = null,
     bottomBarMotionSpec: com.android.purebilibili.core.ui.motion.BottomBarMotionSpec,
     isDarkTheme: Boolean,
-    useRefractionLens: Boolean = true,
     swapMotionAxes: Boolean = false,
     indicatorAlignment: Alignment = Alignment.CenterStart
 ) {
@@ -3832,7 +3831,7 @@ internal fun BoxScope.KernelSuBottomBarIndicatorLayer(
                         backdrop = indicatorBackdrop,
                         shape = { shellShape },
                         effects = {
-                            if (useRefractionLens && shouldUseBottomBarIndicatorLens(liquidGlassPreset)) {
+                            if (shouldUseBottomBarIndicatorLens(liquidGlassPreset)) {
                                 lens(
                                     refractionHeight = (
                                         indicatorLensSpec.refractionHeightDp *

@@ -127,8 +127,6 @@ internal fun resolveTopTabDockIndicatorHorizontalGapDp(hasOuterChromeSurface: Bo
 internal fun resolveTopTabDockIndicatorVerticalGapDp(hasOuterChromeSurface: Boolean): Float =
     if (hasOuterChromeSurface) 10f else 4f
 
-internal fun shouldUseTopTabIndicatorRefraction(): Boolean = false
-
 internal fun resolveTopTabDockIndicatorWidthDp(
     itemWidthDp: Float,
     horizontalGapDp: Float,
@@ -693,6 +691,7 @@ private fun LightweightHomeTopTabs(
     topTabSkinIconPaths: Map<String, TopTabSkinIconPaths> = emptyMap(),
     partitionSkinIconPath: String? = null,
     hasOuterChromeSurface: Boolean = false,
+    isTransitionRunning: Boolean = false,
     showPartitionAction: Boolean = true,
     forceMaterialUnderline: Boolean = false
 ) {
@@ -1044,12 +1043,32 @@ private fun LightweightHomeTopTabs(
             (isLiquidGlassEnabled || backdrop != null) &&
                 !skinPlainStyle &&
                 !hasSkinStickerIcons
-        val useTopTabIndicatorRefractionLens = shouldUseTopTabIndicatorRefraction()
+        val isTopTabIndicatorInteractionActive =
+            topTabDragActive || topTabShouldStretchIndicator || topTabPressProgress > 0.001f
+        val shouldRenderTopTabIndicatorBackdrop = shouldRenderBottomBarIndicatorBackdrop(
+            glassEnabled = shouldUseLiquidGlassIndicator,
+            hasContentBackdrop = backdrop != null,
+            indicatorProgress = topTabMotionProgress,
+            isTransitionRunning = isTransitionRunning,
+            isBottomBarInteractionActive = isTopTabIndicatorInteractionActive,
+            allowIdleGlassEffect = false,
+            allowTransitionIndicatorPulse = topTabPressProgress > 0.001f
+        )
         val topTabContentBackdrop = rememberLayerBackdrop()
         val topTabIndicatorContentBackdrop = if (shouldPrimeTopTabLiquidGlassCapture && backdrop != null) {
             rememberCombinedBackdrop(backdrop, topTabContentBackdrop)
         } else {
             topTabContentBackdrop
+        }
+        val effectiveTopTabIndicatorContentBackdrop = if (shouldRenderTopTabIndicatorBackdrop) {
+            topTabIndicatorContentBackdrop
+        } else {
+            null
+        }
+        val effectiveTopTabIndicatorBackdrop = if (shouldRenderTopTabIndicatorBackdrop) {
+            backdrop
+        } else {
+            null
         }
         val measuredSelectedItemLeftPx by remember(shouldUseMovingIosCapsule) {
             derivedStateOf {
@@ -1145,8 +1164,8 @@ private fun LightweightHomeTopTabs(
                             indicatorHeight = dockIndicatorHeight,
                             shellShape = capsuleShape,
                             liquidGlassPreset = BottomBarLiquidGlassPreset.BILIPAI_TUNED,
-                            contentBackdrop = topTabIndicatorContentBackdrop,
-                            backdrop = backdrop,
+                            contentBackdrop = effectiveTopTabIndicatorContentBackdrop,
+                            backdrop = effectiveTopTabIndicatorBackdrop,
                             indicatorLensSpec = topTabIndicatorLensSpec,
                             refractionMotionProfile = topTabRefractionMotionProfile,
                             indicatorHighlightAlpha = topTabIndicatorHighlightAlpha,
@@ -1163,8 +1182,7 @@ private fun LightweightHomeTopTabs(
                             indicatorLayerScaleProgress = topTabIndicatorLayerScaleProgress,
                             indicatorLayerScaleTransform = topTabIndicatorLayerScaleTransform,
                             bottomBarMotionSpec = topTabDragMotionSpec,
-                            isDarkTheme = isDarkTheme,
-                            useRefractionLens = useTopTabIndicatorRefractionLens
+                            isDarkTheme = isDarkTheme
                         )
                     } else {
                         val capsuleShape = resolveSharedBottomBarCapsuleShape()
@@ -1204,8 +1222,8 @@ private fun LightweightHomeTopTabs(
                         indicatorHeight = dockIndicatorHeight,
                         shellShape = resolveSharedBottomBarCapsuleShape(),
                         liquidGlassPreset = BottomBarLiquidGlassPreset.BILIPAI_TUNED,
-                        contentBackdrop = topTabIndicatorContentBackdrop,
-                        backdrop = backdrop,
+                        contentBackdrop = effectiveTopTabIndicatorContentBackdrop,
+                        backdrop = effectiveTopTabIndicatorBackdrop,
                         indicatorLensSpec = topTabIndicatorLensSpec,
                         refractionMotionProfile = topTabRefractionMotionProfile,
                         indicatorHighlightAlpha = topTabIndicatorHighlightAlpha,
@@ -1221,8 +1239,7 @@ private fun LightweightHomeTopTabs(
                         indicatorLayerScaleProgress = topTabIndicatorLayerScaleProgress,
                         indicatorLayerScaleTransform = topTabIndicatorLayerScaleTransform,
                         bottomBarMotionSpec = topTabDragMotionSpec,
-                        isDarkTheme = isDarkTheme,
-                        useRefractionLens = useTopTabIndicatorRefractionLens
+                        isDarkTheme = isDarkTheme
                     )
                 }
                 if (shouldUseMd3LiquidCapsule) {
@@ -1237,8 +1254,8 @@ private fun LightweightHomeTopTabs(
                         indicatorHeight = dockIndicatorHeight,
                         shellShape = capsuleShape,
                         liquidGlassPreset = BottomBarLiquidGlassPreset.BILIPAI_TUNED,
-                        contentBackdrop = topTabIndicatorContentBackdrop,
-                        backdrop = backdrop,
+                        contentBackdrop = effectiveTopTabIndicatorContentBackdrop,
+                        backdrop = effectiveTopTabIndicatorBackdrop,
                         indicatorLensSpec = topTabIndicatorLensSpec,
                         refractionMotionProfile = topTabRefractionMotionProfile,
                         indicatorHighlightAlpha = topTabIndicatorHighlightAlpha,
@@ -1256,8 +1273,7 @@ private fun LightweightHomeTopTabs(
                         indicatorLayerScaleProgress = topTabIndicatorLayerScaleProgress,
                         indicatorLayerScaleTransform = topTabIndicatorLayerScaleTransform,
                         bottomBarMotionSpec = topTabDragMotionSpec,
-                        isDarkTheme = isDarkTheme,
-                        useRefractionLens = useTopTabIndicatorRefractionLens
+                        isDarkTheme = isDarkTheme
                     )
                 }
                 LazyRow(
@@ -1364,8 +1380,8 @@ private fun LightweightHomeTopTabs(
                             indicatorHeight = 4.dp,
                             shellShape = AppShapes.container(ContainerLevel.Pill),
                             liquidGlassPreset = BottomBarLiquidGlassPreset.BILIPAI_TUNED,
-                            contentBackdrop = topTabIndicatorContentBackdrop,
-                            backdrop = backdrop,
+                            contentBackdrop = effectiveTopTabIndicatorContentBackdrop,
+                            backdrop = effectiveTopTabIndicatorBackdrop,
                             indicatorLensSpec = topTabIndicatorLensSpec,
                             refractionMotionProfile = topTabRefractionMotionProfile,
                             indicatorHighlightAlpha = topTabIndicatorHighlightAlpha,
@@ -1380,7 +1396,6 @@ private fun LightweightHomeTopTabs(
                             indicatorLayerScaleTransform = topTabIndicatorLayerScaleTransform,
                             bottomBarMotionSpec = topTabDragMotionSpec,
                             isDarkTheme = isDarkTheme,
-                            useRefractionLens = useTopTabIndicatorRefractionLens,
                             indicatorAlignment = Alignment.BottomStart
                         )
                     } else if (!shouldUseMd3DockBackedCapsule) {
@@ -1661,6 +1676,7 @@ fun CategoryTabRow(
         topTabSkinIconPaths = topTabSkinIconPaths,
         partitionSkinIconPath = partitionSkinIconPath,
         hasOuterChromeSurface = hasOuterChromeSurface,
+        isTransitionRunning = isTransitionRunning,
         showPartitionAction = showPartitionAction,
         forceMaterialUnderline = forceMaterialUnderline
     )

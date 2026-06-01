@@ -158,8 +158,9 @@ class HomeChromeLiquidSurfaceStructureTest {
                 topBarSource.contains("val topTabContentBackdrop = rememberLayerBackdrop()") &&
                 topBarSource.contains("rememberCombinedBackdrop(backdrop, topTabContentBackdrop)") &&
                 topBarSource.contains("layerBackdrop(topTabContentBackdrop)") &&
-                topBarSource.contains("contentBackdrop = topTabIndicatorContentBackdrop") &&
-                topBarSource.contains("useRefractionLens = useTopTabIndicatorRefractionLens") &&
+                topBarSource.contains("shouldRenderBottomBarIndicatorBackdrop(") &&
+                topBarSource.contains("allowIdleGlassEffect = false") &&
+                topBarSource.contains("contentBackdrop = effectiveTopTabIndicatorContentBackdrop") &&
                 topBarSource.contains("else if (!shouldUseMd3DockBackedCapsule)")
         )
         assertFalse(
@@ -206,7 +207,17 @@ class HomeChromeLiquidSurfaceStructureTest {
     }
 
     @Test
-    fun `top tab indicator keeps bottom bar layer without refraction lens`() {
-        assertFalse(shouldUseTopTabIndicatorRefraction())
+    fun `top tab indicator reuses bottom bar idle backdrop policy`() {
+        assertFalse(
+            shouldRenderBottomBarIndicatorBackdrop(
+                glassEnabled = true,
+                hasContentBackdrop = true,
+                indicatorProgress = 0f,
+                isTransitionRunning = false,
+                isBottomBarInteractionActive = false,
+                allowIdleGlassEffect = false,
+                allowTransitionIndicatorPulse = false
+            )
+        )
     }
 }
