@@ -1514,10 +1514,10 @@ private fun LightweightTopTabItem(
         else -> colorScheme.secondaryContainer.copy(alpha = 0.70f * selectionFraction)
     }
     val itemShape = when {
-        skinPlainStyle -> RoundedCornerShape(0.dp)
+        skinPlainStyle -> androidx.compose.ui.graphics.RectangleShape
         renderer == HomeTopTabRenderer.IOS -> resolveSharedBottomBarCapsuleShape()
-        renderer == HomeTopTabRenderer.MD3 -> RoundedCornerShape(0.dp)
-        else -> RoundedCornerShape(14.dp)
+        renderer == HomeTopTabRenderer.MD3 -> androidx.compose.ui.graphics.RectangleShape
+        else -> AppShapes.container(ContainerLevel.Dialog)
     }
 
     Box(

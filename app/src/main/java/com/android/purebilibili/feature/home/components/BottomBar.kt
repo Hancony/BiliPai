@@ -127,7 +127,9 @@ import com.android.purebilibili.feature.home.LocalHomeScrollOffset
 import com.android.purebilibili.core.ui.motion.BottomBarMotionProfile
 import com.android.purebilibili.core.ui.motion.AppMotionEasing
 import com.android.purebilibili.core.ui.motion.resolveBottomBarMotionSpec
+import com.android.purebilibili.core.ui.AppShapes
 import com.android.purebilibili.core.ui.AppSurfaceTokens
+import com.android.purebilibili.core.ui.ContainerLevel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import dev.chrisbanes.haze.hazeEffect // [New]
@@ -1286,13 +1288,14 @@ internal fun resolveBottomBarSkinContentColors(
     )
 }
 
+@Composable
 private fun Modifier.bottomBarSkinLabelScrim(
     color: Color,
     alpha: Float
 ): Modifier {
     if (alpha <= 0f) return this
     return this
-        .clip(RoundedCornerShape(6.dp))
+        .clip(AppShapes.container(ContainerLevel.Chip))
         .background(color.copy(alpha = alpha.coerceIn(0f, 1f)))
         .padding(horizontal = 4.dp, vertical = 1.dp)
 }
@@ -2992,10 +2995,6 @@ private fun KernelSuAlignedBottomBar(
         isDragging = dampedDragState.isDragging
     )
     val indicatorLayerScaleProgress = maxOf(indicatorDragScaleProgress, effectivePressProgress)
-    val indicatorLayerScaleTransform = BottomBarIndicatorLayerTransform(
-        scaleX = dampedDragState.scaleX,
-        scaleY = dampedDragState.scaleY
-    )
     val materialScrollProgress by animateFloatAsState(
         targetValue = if (isFeedScrollInProgress) 1f else 0f,
         animationSpec = tween(
@@ -3632,7 +3631,7 @@ private fun KernelSuAlignedBottomBar(
                     velocityItemsPerSecond = dampedDragState.deformationVelocityItemsPerSecond,
                     isDragging = dampedDragState.isDragging,
                     indicatorLayerScaleProgress = indicatorLayerScaleProgress,
-                    indicatorLayerScaleTransform = indicatorLayerScaleTransform,
+                    indicatorLayerScaleTransform = null,
                     bottomBarMotionSpec = bottomBarMotionSpec,
                     isDarkTheme = isDarkTheme
                 )

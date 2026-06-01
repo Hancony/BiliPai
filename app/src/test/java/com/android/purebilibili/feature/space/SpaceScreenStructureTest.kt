@@ -38,14 +38,14 @@ class SpaceScreenStructureTest {
     }
 
     @Test
-    fun `space high frequency video cards join shared element transition`() {
+    fun `space high frequency video covers join shared element transition`() {
         val source = loadSource("app/src/main/java/com/android/purebilibili/feature/space/SpaceScreen.kt")
 
         assertTrue(source.contains("sharedTransitionKey = resolveSpaceArchiveSharedTransitionKey(video.bvid)"))
         assertTrue(source.contains("sharedTransitionKey = resolveSpaceArchiveSharedTransitionKey(topVideo.bvid)"))
         assertTrue(source.contains("sharedTransitionKey = resolveSpaceArchiveSharedTransitionKey(item.bvid)"))
         assertTrue(source.contains("CardPositionManager.recordVideoCardPosition("))
-        assertTrue(source.contains("videoCardShellSharedElementKey("))
+        assertTrue(source.contains("videoCoverSharedElementKey("))
         assertTrue(source.contains("clipInOverlayDuringTransition = OverlayClip(coverShape)"))
     }
 

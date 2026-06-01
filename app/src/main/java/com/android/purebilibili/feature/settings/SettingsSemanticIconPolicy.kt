@@ -249,7 +249,7 @@ private fun resolveMd3SettingsSemanticIcon(role: SettingsIconRole): ImageVector 
     SettingsIconRole.CARD_TRANSITION_ANIMATION -> Icons.Outlined.SyncAlt
     SettingsIconRole.TOP_DOCK_GLASS -> Icons.Outlined.Layers
     SettingsIconRole.BOTTOM_BAR_GLASS -> Icons.Outlined.BlurCircular
-    SettingsIconRole.TOP_BAR_BLUR -> Icons.Outlined.Layers
+    SettingsIconRole.TOP_BAR_BLUR -> Icons.Outlined.ViewHeadline
     SettingsIconRole.BOTTOM_BAR_BLUR -> Icons.Outlined.BlurLinear
     SettingsIconRole.FLOATING_BOTTOM_BAR -> Icons.Outlined.ViewAgenda
     SettingsIconRole.HARDWARE_DECODER -> Icons.Outlined.Memory
@@ -364,7 +364,7 @@ private fun resolveIosSettingsSemanticIcon(role: SettingsIconRole): ImageVector 
     SettingsIconRole.CARD_TRANSITION_ANIMATION -> CupertinoIcons.Outlined.ArrowLeftAndRight
     SettingsIconRole.TOP_DOCK_GLASS -> CupertinoIcons.Outlined.MenubarRectangle
     SettingsIconRole.BOTTOM_BAR_GLASS -> CupertinoIcons.Outlined.Square3Layers3dDownRight
-    SettingsIconRole.TOP_BAR_BLUR -> CupertinoIcons.Outlined.MenubarRectangle
+    SettingsIconRole.TOP_BAR_BLUR -> CupertinoIcons.Outlined.SquareSplit2x1
     SettingsIconRole.BOTTOM_BAR_BLUR -> CupertinoIcons.Outlined.SquareStack
     SettingsIconRole.FLOATING_BOTTOM_BAR -> CupertinoIcons.Outlined.RectangleConnectedToLineBelow
     SettingsIconRole.HARDWARE_DECODER -> CupertinoIcons.Outlined.Cpu

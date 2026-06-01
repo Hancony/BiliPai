@@ -609,7 +609,7 @@ fun AppearanceSettingsContent(
                         Spacer(modifier = Modifier.height(12.dp))
                         IOSDivider()
                         IOSClickableItem(
-                            icon = rememberSettingsSemanticIcon(SettingsIconRole.COLOR_STYLE),
+                            icon = rememberSettingsSemanticIcon(SettingsIconRole.DYNAMIC_COLOR),
                             title = "自定义 MD3 颜色",
                             subtitle = if (state.md3ColorSource == Md3ColorSource.CUSTOM) {
                                 "使用 HSV 取色器或 HEX 输入精确选择"

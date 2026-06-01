@@ -93,13 +93,17 @@ class HomeChromeLiquidSurfaceStructureTest {
                 topHeaderSource.contains("HomeTopSearchPillContent(") &&
                 topHeaderSource.contains("HomeTopUnreadBadge(")
         )
+        val searchLayerIndex = topHeaderSource.indexOf(".height(currentSearchHeight)")
+        val tabsThenSearchIndex = topHeaderSource.indexOf("if (topLayoutOrder == HomeTopLayoutOrder.TABS_THEN_SEARCH)")
+        val searchThenTabsIndex = topHeaderSource.indexOf("if (topLayoutOrder == HomeTopLayoutOrder.SEARCH_THEN_TABS)")
         assertTrue(
-            "top tabs should render after the search layer so expanded state matches the reference screenshot",
-            topHeaderSource.indexOf(".height(currentSearchHeight)") in 0 until topHeaderSource.indexOf("topTabsContent()")
+            "search-first mode should render top tabs after the search layer",
+            searchLayerIndex in 0 until searchThenTabsIndex &&
+                topHeaderSource.indexOf("topTabsContent()", startIndex = searchThenTabsIndex) > searchThenTabsIndex
         )
-        assertFalse(
-            "top tabs should be called after search height instead of swapping search below tabs",
-            topHeaderSource.substringBefore(".height(currentSearchHeight)").contains("topTabsContent()")
+        assertTrue(
+            "tabs-first mode should keep its explicit branch before the search layer",
+            tabsThenSearchIndex in 0 until searchLayerIndex
         )
         assertTrue(
             "top tab row should use the lightweight native tab implementation",
@@ -185,8 +189,8 @@ class HomeChromeLiquidSurfaceStructureTest {
                 bottomBar.readText().contains("glassEnabled && drawShellLens") &&
                 bottomBar.readText().contains("shellRefractionHeightDp") &&
                 bottomBar.readText().contains("shellRefractionAmountDp") &&
-                bottomBar.readText().contains("depthEffect = true") &&
-                bottomBar.readText().contains("shellChromaticAberration")
+                bottomBar.readText().contains("runtimeShaderEffect(") &&
+                bottomBar.readText().contains("LIQUID_GLASS_SHADER_KEY")
         )
         assertFalse(
             "bottom bar should not keep the old appChromeLiquidSurface renderer",

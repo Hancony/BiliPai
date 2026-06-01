@@ -150,9 +150,9 @@ object AppMotionTokens {
     fun <T> resolveSpatialSpec(
         uiPreset: UiPreset,
         androidNativeVariant: AndroidNativeVariant
-    ): FiniteAnimationSpec<T> = tween(
-        durationMillis = SHARED_TRANSITION_DURATION_MILLIS,
-        easing = SHARED_TRANSITION_EASING
+    ): FiniteAnimationSpec<T> = spring(
+        dampingRatio = 0.82f,
+        stiffness = 380f
     )
 
     @Composable

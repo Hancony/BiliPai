@@ -65,7 +65,7 @@ private fun spaceForwardTransform(): ContentTransform {
         slideInHorizontally(
             animationSpec = tween(NAV3_SPACE_FORWARD_MILLIS, easing = AppMotionEasing.EmphasizedEnter),
             initialOffsetX = { width -> width / 8 }
-        ) + fadeIn(animationSpec = tween(NAV3_SPACE_FORWARD_MILLIS, easing = AppMotionEasing.EmphasizedEnter))
+        ) + fadeIn(animationSpec = tween(NAV3_SPACE_FORWARD_MILLIS))
     ) togetherWith fadeOut(animationSpec = tween(NAV3_FALLBACK_FADE_MILLIS))
 }
 
