@@ -321,8 +321,7 @@ internal fun Modifier.horizontalDragGesture(
     notifyIndexChanged
 ) {
     inspectDragGestures(
-        onDragStart = { down ->
-            down.consume()
+        onDragStart = {
             dragState.onDrag(0f, itemWidthPx)
         },
         onDragEnd = {
@@ -342,7 +341,7 @@ internal fun Modifier.horizontalDragGesture(
             )
         }
     ) { change, dragAmount ->
-        if (consumePointerChanges) {
+        if (consumePointerChanges && dragAmount != Offset.Zero) {
             change.consume()
         }
         dragState.onDrag(dragAmount.x, itemWidthPx)
@@ -384,9 +383,6 @@ private suspend inline fun AwaitPointerEventScope.drag(
     var pointer = pointerId
     while (true) {
         val change = awaitDragOrUp(pointer) ?: return null
-        if (change.isConsumed) {
-            return null
-        }
         if (change.changedToUpIgnoreConsumed()) {
             return change
         }
@@ -400,7 +396,7 @@ private suspend inline fun AwaitPointerEventScope.awaitDragOrUp(
 ): PointerInputChange? {
     var pointer = pointerId
     while (true) {
-        val event = awaitPointerEvent()
+        val event = awaitPointerEvent(PointerEventPass.Initial)
         val dragEvent = event.changes.fastFirstOrNull { it.id == pointer } ?: return null
         if (dragEvent.changedToUpIgnoreConsumed()) {
             val otherDown = event.changes.fastFirstOrNull { it.pressed }

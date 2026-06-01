@@ -25,7 +25,7 @@ class BottomBarMiuixStructureTest {
         assertTrue(source.contains("KernelSuMiuixBottomBarIndicatorLayer("))
         assertTrue(source.contains("internal fun BoxScope.KernelSuBottomBarIndicatorLayer("))
         assertTrue(source.contains("private fun KernelSuBottomBarSearchSlot("))
-        assertFalse(source.contains("KernelSuBottomBarInputLayer("))
+        assertTrue(source.contains("KernelSuBottomBarInputLayer("))
         assertTrue(source.contains("uiSkinDecoration: BottomBarUiSkinDecoration? = null"))
         assertTrue(source.contains("decoration = uiSkinDecoration"))
         assertTrue(source.contains("BottomBarSkinDecorativeTrim("))
@@ -121,10 +121,10 @@ class BottomBarMiuixStructureTest {
         assertTrue(kernelSuRendererSource.contains(".width(indicatorWidth)"))
         assertTrue(kernelSuRendererSource.contains(".height(indicatorHeight)"))
         assertTrue(kernelSuRendererSource.contains(".zIndex(2f)"))
-        assertTrue(kernelSuRendererSource.contains("Modifier.horizontalDragGesture("))
+        assertTrue(kernelSuRendererSource.contains(".horizontalDragGesture("))
         assertTrue(kernelSuRendererSource.contains("dampedDragState = dampedDragState"))
         assertTrue(kernelSuRendererSource.contains("itemWidthPx = itemWidthPx"))
-        assertTrue(kernelSuRendererSource.contains("interactive = !effectiveSearchExpanded"))
+        assertTrue(kernelSuRendererSource.contains("interactive = false"))
         assertTrue(kernelSuRendererSource.contains("onPressChanged = dampedDragState::setPressed"))
         assertFalse(kernelSuAlignedBodySource.contains("scaleX = indicatorSettleReboundTransform.scaleX"))
         assertFalse(kernelSuAlignedBodySource.contains("scaleY = indicatorSettleReboundTransform.scaleY"))
@@ -278,7 +278,7 @@ class BottomBarMiuixStructureTest {
         assertTrue(visibleContentIndex > skinIndex)
         assertTrue(captureIndex > visibleContentIndex)
         assertTrue(indicatorIndex > captureIndex)
-        assertFalse(kernelSuRendererSource.contains("KernelSuBottomBarInputLayer("))
+        assertTrue(kernelSuRendererSource.contains("KernelSuBottomBarInputLayer("))
         val capturedSkinIndex = refractionCaptureSource.indexOf("BottomBarSkinDecorativeTrim(")
         val capturedContentIndex = refractionCaptureSource.indexOf("val coverage = itemCoverage(index)")
         assertTrue(capturedSkinIndex >= 0)
@@ -324,8 +324,8 @@ class BottomBarMiuixStructureTest {
         assertTrue(itemRendererSource.contains("verticalArrangement = Arrangement.Center"))
         assertFalse(itemRendererSource.contains("readabilityBackdropColor"))
         assertFalse(itemRendererSource.contains("translationY = -3.dp"))
-        assertFalse(source.contains("BottomBarInputTarget("))
-        assertFalse(source.contains("KernelSuBottomBarInputLayer("))
+        assertTrue(source.contains("BottomBarInputTarget("))
+        assertTrue(source.contains("KernelSuBottomBarInputLayer("))
     }
 
     @Test
@@ -343,7 +343,7 @@ class BottomBarMiuixStructureTest {
         assertTrue(itemRendererSource.contains("itemWidth: Dp"))
         assertTrue(itemRendererSource.contains(".width(itemWidth)"))
         assertFalse(itemRendererSource.contains(".defaultMinSize(minWidth = 76.dp)"))
-        assertFalse(source.contains("BottomBarInputTarget("))
+        assertTrue(source.contains("BottomBarInputTarget("))
     }
 
     @Test
@@ -466,9 +466,9 @@ class BottomBarMiuixStructureTest {
         assertTrue(visibleContentIndex >= 0)
         assertTrue(tintCaptureIndex > visibleContentIndex)
         assertTrue(indicatorIndex > tintCaptureIndex)
-        assertFalse(kernelSuRendererSource.contains("KernelSuBottomBarInputLayer("))
-        assertTrue(kernelSuRendererSource.contains("interactive = !effectiveSearchExpanded"))
-        assertTrue(kernelSuRendererSource.contains("Modifier.horizontalDragGesture("))
+        assertTrue(kernelSuRendererSource.contains("KernelSuBottomBarInputLayer("))
+        assertTrue(kernelSuRendererSource.contains("interactive = false"))
+        assertTrue(kernelSuRendererSource.contains(".horizontalDragGesture("))
     }
 
     @Test
@@ -526,8 +526,8 @@ class BottomBarMiuixStructureTest {
         val itemSource = source.substringAfter("@Composable\nprivate fun RowScope.AndroidNativeBottomBarItem(")
 
         assertTrue(kernelSuRendererSource.contains("onPressChanged = dampedDragState::setPressed"))
-        assertFalse(source.contains("BottomBarInputTarget("))
-        assertFalse(source.contains("KernelSuBottomBarInputLayer("))
+        assertTrue(source.contains("BottomBarInputTarget("))
+        assertTrue(source.contains("KernelSuBottomBarInputLayer("))
         assertTrue(itemSource.contains("collectIsPressedAsState()"))
         assertTrue(itemSource.contains("LaunchedEffect(isPressed, interactive)"))
         assertTrue(itemSource.contains("DisposableEffect(interactive)"))
