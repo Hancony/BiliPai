@@ -100,6 +100,64 @@ class AppNavigationNavigation3BridgeStructureTest {
     }
 
     @Test
+    fun favoriteVideoClickKeepsFavoriteAsVideoSourceRoute() {
+        val source = appNavigationSource()
+        val favoriteBranch = source
+            .substringAfter("BiliPaiNavEntryContentRole.FAVORITE ->")
+            .substringBefore("BiliPaiNavEntryContentRole.LIKED_VIDEOS ->")
+        val videoClickBlock = favoriteBranch
+            .substringAfter("onVideoClick = { bvid, cid, cover ->")
+            .substringBefore("onFavoriteFolderClick =")
+
+        assertTrue(videoClickBlock.contains("sourceRoute = ScreenRoutes.Favorite.route"))
+    }
+
+    @Test
+    fun videoReturnEntersMiniPlayerBeforePoppingDestination() {
+        val source = appNavigationSource()
+        val videoDetailBranch = source
+            .substringAfter("BiliPaiNavEntryContentRole.VIDEO_DETAIL ->")
+            .substringBefore("BiliPaiNavEntryContentRole.ARTICLE_DETAIL ->")
+        val onBackBlock = videoDetailBranch
+            .substringAfter("onBack = {")
+            .substringBefore("onHomeClick = {")
+        val prepareMiniPlayerIndex = onBackBlock.indexOf("prepareVideoPlaybackForNavigationExit(videoKey)")
+        val popIndex = onBackBlock.indexOf("popBiliPaiNavKey(navigation3BackStack)")
+
+        assertTrue(prepareMiniPlayerIndex >= 0)
+        assertTrue(prepareMiniPlayerIndex < popIndex)
+        assertTrue(source.contains("manager.enterMiniMode()"))
+    }
+
+    @Test
+    fun systemBackPreparesVideoMiniPlayerBeforePoppingDestination() {
+        val source = appNavigationSource()
+        val navigateUpBlock = source
+            .substringAfter("AppSystemBackAction.NAVIGATE_UP ->")
+            .substringBefore("AppSystemBackAction.FINISH_ACTIVITY ->")
+        val prepareIndex = navigateUpBlock.indexOf("prepareVideoPlaybackForNavigationExit")
+        val popIndex = navigateUpBlock.indexOf("popBiliPaiNavKey(navigation3BackStack)")
+
+        assertTrue(prepareIndex >= 0)
+        assertTrue(prepareIndex < popIndex)
+    }
+
+    @Test
+    fun seasonSeriesVideosUseMatchingSharedElementSourceRoute() {
+        val source = appNavigationSource()
+        val detailBranch = source
+            .substringAfter("BiliPaiNavEntryContentRole.SEASON_SERIES_DETAIL ->")
+            .substringBefore("BiliPaiNavEntryContentRole.BANGUMI ->")
+
+        assertTrue(
+            detailBranch.contains(
+                "LocalVideoCardSharedElementSourceRoute provides seasonSeriesKey.toLegacyRoute()"
+            )
+        )
+        assertTrue(detailBranch.contains("sourceRoute = seasonSeriesKey.toLegacyRoute()"))
+    }
+
+    @Test
     fun dynamicDetailProvidesVideoCardSourceRouteForSharedElementReturn() {
         val source = appNavigationSource()
         val dynamicDetailBranch = source

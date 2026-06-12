@@ -1036,6 +1036,15 @@ fun AppNavigation(
                 }
             }
 
+            fun prepareVideoPlaybackForNavigationExit(videoKey: BiliPaiNavKey.VideoDetail) {
+                val manager = miniPlayerManager ?: return
+                if (manager.shouldShowInAppMiniPlayer()) {
+                    manager.enterMiniMode()
+                } else if (shouldMarkNavigationLeaveBeforeVideoExit(isMiniMode = manager.isMiniMode)) {
+                    manager.markLeavingByNavigation(expectedBvid = videoKey.bvid)
+                }
+            }
+
             val performSystemBackAction = {
                 when (systemBackAction) {
                     AppSystemBackAction.RETURN_TO_HOME_TAB -> {
@@ -1047,6 +1056,8 @@ fun AppNavigation(
                     AppSystemBackAction.NAVIGATE_UP -> {
                         val previousKey = navigation3BackStack.getOrNull(navigation3BackStack.lastIndex - 1)
                         markNavigation3VideoReturnBeforeBackAction(targetKey = previousKey)
+                        (navigation3BackStack.lastOrNull() as? BiliPaiNavKey.VideoDetail)
+                            ?.let(::prepareVideoPlaybackForNavigationExit)
                         navigation3BackStack = popBiliPaiNavKey(navigation3BackStack)
                     }
                     AppSystemBackAction.FINISH_ACTIVITY -> context.findActivity()?.finish()
@@ -1504,16 +1515,7 @@ fun AppNavigation(
                                         activity?.isChangingConfigurations != true &&
                                         !isNavigatingToAudioMode
                                     ) {
-                                        if (
-                                            shouldMarkNavigationLeaveBeforeVideoExit(
-                                                isMiniMode = miniPlayerManager?.isMiniMode == true
-                                            )
-                                        ) {
-                                            miniPlayerManager?.markLeavingByNavigation(expectedBvid = videoKey.bvid)
-                                        }
-                                        if (miniPlayerManager?.shouldShowInAppMiniPlayer() == true) {
-                                            miniPlayerManager.enterMiniMode()
-                                        }
+                                        prepareVideoPlaybackForNavigationExit(videoKey)
                                     }
                                 }
                             }
@@ -1554,25 +1556,13 @@ fun AppNavigation(
                                 onBack = {
                                     navigation3ReturnSession =
                                         navigation3ReturnSession.markReturning(SystemClock.uptimeMillis())
-                                    if (
-                                        shouldMarkNavigationLeaveBeforeVideoExit(
-                                            isMiniMode = miniPlayerManager?.isMiniMode == true
-                                        )
-                                    ) {
-                                        miniPlayerManager?.markLeavingByNavigation(expectedBvid = videoKey.bvid)
-                                    }
+                                    prepareVideoPlaybackForNavigationExit(videoKey)
                                     navigation3BackStack = popBiliPaiNavKey(navigation3BackStack)
                                 },
                                 onHomeClick = {
                                     navigation3ReturnSession =
                                         navigation3ReturnSession.markReturning(SystemClock.uptimeMillis())
-                                    if (
-                                        shouldMarkNavigationLeaveBeforeVideoExit(
-                                            isMiniMode = miniPlayerManager?.isMiniMode == true
-                                        )
-                                    ) {
-                                        miniPlayerManager?.markLeavingByNavigation(expectedBvid = videoKey.bvid)
-                                    }
+                                    prepareVideoPlaybackForNavigationExit(videoKey)
                                     // 先把 bottom pager 静默切到 HOME（被详情页遮挡，切换不可见），
                                     // 再 pop 至 MainHost 触发与系统返回相同的横向过渡。
                                     val homeIndex = visibleBottomBarItems.indexOf(BottomNavItem.HOME)
@@ -1885,7 +1875,14 @@ fun AppNavigation(
                                     onBack = { performSystemBackAction() },
                                     globalHazeState = mainHazeState,
                                     scrollToTopChannel = favoriteScrollChannel,
-                                    onVideoClick = { bvid, cid, cover -> navigateToVideoInNavigation3(bvid, cid, cover) },
+                                    onVideoClick = { bvid, cid, cover ->
+                                        navigateToVideoInNavigation3(
+                                            bvid = bvid,
+                                            cid = cid,
+                                            coverUrl = cover,
+                                            sourceRoute = ScreenRoutes.Favorite.route
+                                        )
+                                    },
                                     onFavoriteFolderClick = { mediaId, ownerMid, title, ownerName ->
                                         pushNavigation3Key(
                                             BiliPaiNavKey.SeasonSeriesDetail(
@@ -2000,24 +1997,33 @@ fun AppNavigation(
                                     )
                                 }
 
-                                CommonListScreen(
-                                    viewModel = viewModel,
-                                    onBack = { performSystemBackAction() },
-                                    onVideoClick = { bvid, cid, cover ->
-                                        navigateToVideoInNavigation3(bvid, cid, cover)
-                                    },
-                                    onCollectionClick = { route ->
-                                        pushNavigation3Key(
-                                            BiliPaiNavKey.SeasonSeriesDetail(
-                                                type = route.type,
-                                                id = route.id,
-                                                mid = route.mid,
-                                                title = route.title,
-                                                ownerName = route.ownerName
+                                CompositionLocalProvider(
+                                    LocalVideoCardSharedElementSourceRoute provides seasonSeriesKey.toLegacyRoute()
+                                ) {
+                                    CommonListScreen(
+                                        viewModel = viewModel,
+                                        onBack = { performSystemBackAction() },
+                                        onVideoClick = { bvid, cid, cover ->
+                                            navigateToVideoInNavigation3(
+                                                bvid = bvid,
+                                                cid = cid,
+                                                coverUrl = cover,
+                                                sourceRoute = seasonSeriesKey.toLegacyRoute()
                                             )
-                                        )
-                                    }
-                                )
+                                        },
+                                        onCollectionClick = { route ->
+                                            pushNavigation3Key(
+                                                BiliPaiNavKey.SeasonSeriesDetail(
+                                                    type = route.type,
+                                                    id = route.id,
+                                                    mid = route.mid,
+                                                    title = route.title,
+                                                    ownerName = route.ownerName
+                                                )
+                                            )
+                                        }
+                                    )
+                                }
                             }
                         BiliPaiNavEntryContentRole.BANGUMI -> {
                                 val bangumiKey = key as BiliPaiNavKey.Bangumi

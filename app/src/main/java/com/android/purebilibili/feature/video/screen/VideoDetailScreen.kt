@@ -225,11 +225,13 @@ import kotlin.math.roundToInt
 internal fun shouldHandleVideoDetailDisposeAsNavigationExit(
     isNavigatingToAudioMode: Boolean,
     isNavigatingToMiniMode: Boolean,
+    isMiniModeActive: Boolean,
     isChangingConfigurations: Boolean,
     isNavigatingToVideo: Boolean
 ): Boolean {
     return !isNavigatingToAudioMode &&
         !isNavigatingToMiniMode &&
+        !isMiniModeActive &&
         !isChangingConfigurations &&
         !isNavigatingToVideo
 }
@@ -1880,6 +1882,7 @@ fun VideoDetailScreen(
             val shouldHandleAsNavigationExit = shouldHandleVideoDetailDisposeAsNavigationExit(
                 isNavigatingToAudioMode = isNavigatingToAudioMode,
                 isNavigatingToMiniMode = isNavigatingToMiniMode,
+                isMiniModeActive = miniPlayerManager?.isMiniMode == true,
                 isChangingConfigurations = activity?.isChangingConfigurations == true,
                 isNavigatingToVideo = resolveIsNavigatingToVideoDuringDispose(
                     localNavigatingToVideo = isNavigatingToVideo,
@@ -2353,6 +2356,7 @@ fun VideoDetailScreen(
             val shouldHandleAsNavigationExit = shouldHandleVideoDetailDisposeAsNavigationExit(
                 isNavigatingToAudioMode = isNavigatingToAudioMode,
                 isNavigatingToMiniMode = isNavigatingToMiniMode,
+                isMiniModeActive = miniPlayerManager?.isMiniMode == true,
                 isChangingConfigurations = isChangingConfigurations,
                 isNavigatingToVideo = resolveIsNavigatingToVideoDuringDispose(
                     localNavigatingToVideo = isNavigatingToVideo,
