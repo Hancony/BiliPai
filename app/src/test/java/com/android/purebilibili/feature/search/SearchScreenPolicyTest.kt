@@ -328,6 +328,8 @@ class SearchScreenPolicyTest {
         assertFalse(resultPagerBody.contains("SearchFilterBar("))
         assertFalse(searchSource.contains("detectHorizontalDragGestures"))
         assertTrue(searchSource.contains("currentPageOffsetFraction"))
+        assertTrue(searchSource.contains("!searchPagerState.isScrollInProgress"))
+        assertTrue(searchSource.contains(".zIndex(-1f)"))
     }
 
     @Test

@@ -74,6 +74,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.purebilibili.R
 import com.android.purebilibili.core.ui.AdaptiveScaffold
@@ -809,23 +810,34 @@ fun SearchScreen(
                                     }
                                 }
                             )
-                            SearchFilterBar(
-                                currentType = state.searchType,
-                                currentOrder = state.searchOrder,
-                                currentDurations = state.searchDurations,
-                                currentVideoTid = state.videoTid,
-                                currentUpOrder = state.upOrder,
-                                currentUpOrderSort = state.upOrderSort,
-                                currentUpUserType = state.upUserType,
-                                currentLiveOrder = state.liveOrder,
-                                onOrderChange = { viewModel.setSearchOrder(it) },
-                                onDurationToggle = { viewModel.toggleSearchDuration(it) },
-                                onVideoTidChange = { viewModel.setVideoTid(it) },
-                                onUpOrderChange = { viewModel.setUpOrder(it) },
-                                onUpOrderSortChange = { viewModel.setUpOrderSort(it) },
-                                onUpUserTypeChange = { viewModel.setUpUserType(it) },
-                                onLiveOrderChange = { viewModel.setLiveOrder(it) }
-                            )
+                            val showStableFilterBar = !searchPagerState.isScrollInProgress &&
+                                resolveSearchFilterControls(
+                                    currentType = state.searchType,
+                                    currentUpOrder = state.upOrder
+                                ).isNotEmpty()
+                            AnimatedVisibility(
+                                visible = showStableFilterBar,
+                                enter = fadeIn(animationSpec = tween(90)),
+                                exit = fadeOut(animationSpec = tween(70))
+                            ) {
+                                SearchFilterBar(
+                                    currentType = state.searchType,
+                                    currentOrder = state.searchOrder,
+                                    currentDurations = state.searchDurations,
+                                    currentVideoTid = state.videoTid,
+                                    currentUpOrder = state.upOrder,
+                                    currentUpOrderSort = state.upOrderSort,
+                                    currentUpUserType = state.upUserType,
+                                    currentLiveOrder = state.liveOrder,
+                                    onOrderChange = { viewModel.setSearchOrder(it) },
+                                    onDurationToggle = { viewModel.toggleSearchDuration(it) },
+                                    onVideoTidChange = { viewModel.setVideoTid(it) },
+                                    onUpOrderChange = { viewModel.setUpOrder(it) },
+                                    onUpOrderSortChange = { viewModel.setUpOrderSort(it) },
+                                    onUpUserTypeChange = { viewModel.setUpUserType(it) },
+                                    onLiveOrderChange = { viewModel.setLiveOrder(it) }
+                                )
+                            }
                         HorizontalPager(
                             state = searchPagerState,
                             modifier = Modifier.weight(1f),
@@ -2180,7 +2192,7 @@ private fun SearchResultTypeTabRow(
                 selected = selected,
                 onClick = { onTabClick(index, type) },
                 interactionSource = remember { MutableInteractionSource() },
-                selectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                selectedContentColor = MaterialTheme.colorScheme.onSurface,
                 unselectedContentColor = MaterialTheme.colorScheme.outline,
                 modifier = Modifier.height(44.dp)
             ) {
@@ -2188,7 +2200,7 @@ private fun SearchResultTypeTabRow(
                     text = type.displayName,
                     fontSize = 13.sp,
                     fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (selected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.outline,
+                    color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline,
                     maxLines = 1
                 )
             }
@@ -2243,13 +2255,14 @@ private fun SearchPagerTabIndicator(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .zIndex(-1f)
             .wrapContentSize(Alignment.BottomStart)
             .offset(x = indicatorLeft)
             .width(indicatorWidth)
             .padding(horizontal = 3.dp, vertical = 6.dp)
             .height(32.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.72f))
     )
 }
 
