@@ -50,8 +50,8 @@ class BottomBarMiuixStructureTest {
         assertFalse(kernelSuRendererSource.contains("scaleY = lerp(1f, searchLaunchSpec.targetScaleY, searchLaunchProgress)"))
         assertFalse(kernelSuRendererSource.contains("alpha = lerp(1f, searchLaunchSpec.targetAlpha, searchLaunchProgress)"))
         assertTrue(kernelSuRendererSource.contains("val searchLaunchMorphSpec = remember { resolveBottomBarSearchLaunchMorphSpec() }"))
-        assertTrue(kernelSuRendererSource.contains("var searchLaunchInProgress by remember"))
-        assertTrue(kernelSuRendererSource.contains("searchExpansionOverride = BottomBarSearchExpansionOverride.EXPANDED"))
+        assertFalse(kernelSuRendererSource.contains("var searchLaunchInProgress by remember"))
+        assertFalse(kernelSuRendererSource.contains("searchExpansionOverride = BottomBarSearchExpansionOverride.EXPANDED"))
         assertTrue(kernelSuRendererSource.contains("onSearchLaunchTransitionFinished(searchLaunchKey)"))
         assertTrue(kernelSuRendererSource.contains(".width(dockWidth)"))
         assertTrue(kernelSuRendererSource.contains("resolveSharedBottomBarCapsuleShape("))
@@ -427,7 +427,7 @@ class BottomBarMiuixStructureTest {
         val collapsedTapSource = searchCapsuleSource
             .substringAfter("onTap = {")
             .substringBefore("},\n                            onLongPress")
-        assertTrue(collapsedTapSource.contains("currentOnSubmit()"))
+        assertTrue(collapsedTapSource.contains("currentOnCompactClick()"))
         assertFalse(collapsedTapSource.contains("currentOnExpandChange(true)"))
         assertTrue(searchCapsuleSource.contains("BasicTextField("))
         assertTrue(searchCapsuleSource.contains("onClick = onSubmit"))
@@ -449,7 +449,7 @@ class BottomBarMiuixStructureTest {
     }
 
     @Test
-    fun `search launch expands search box before top bar handoff without compressing dock`() {
+    fun `search launch completes handoff without forcing compact home dock`() {
         val source = loadSource("app/src/main/java/com/android/purebilibili/feature/home/components/BottomBar.kt")
 
         val spec = resolveBottomBarSearchLaunchMorphSpec()
@@ -458,7 +458,8 @@ class BottomBarMiuixStructureTest {
 
         assertTrue(source.contains("searchLaunchKey: Int = 0"))
         assertTrue(source.contains("onSearchLaunchTransitionFinished: (Int) -> Unit = {}"))
-        assertTrue(source.contains("searchLaunchInProgress = true"))
+        assertFalse(source.contains("searchLaunchInProgress = true"))
+        assertFalse(source.contains("searchExpansionOverride = BottomBarSearchExpansionOverride.EXPANDED"))
         assertTrue(source.contains("delay(searchLaunchMorphSpec.expandDurationMillis.toLong())"))
         assertTrue(source.contains("onSearchLaunchTransitionFinished(searchLaunchKey)"))
         assertFalse(source.contains("searchLaunchProgressState.animateTo("))

@@ -2,6 +2,7 @@ package com.android.purebilibili.feature.home
 
 internal const val HOME_HERO_CAROUSEL_MAX_ITEMS = 8
 internal const val HOME_HERO_CAROUSEL_SIDE_PEEK_DP = 0f
+internal const val HOME_HERO_CAROUSEL_ASPECT_RATIO = 4f / 3f
 
 internal data class HomeHeroCarouselCardTransform(
     val rotationY: Float,
@@ -50,26 +51,20 @@ internal fun resolveHomeHeroCarouselCardTransform(
 ): HomeHeroCarouselCardTransform {
     val clampedOffset = pageOffset.coerceIn(-1f, 1f)
     val distance = kotlin.math.abs(clampedOffset)
-    val inFlightDistance = distance * (1f - distance)
-    val pivotFractionX = when {
-        clampedOffset < -0.001f -> 0f
-        clampedOffset > 0.001f -> 1f
-        else -> 0.5f
-    }
     return HomeHeroCarouselCardTransform(
-        rotationY = -clampedOffset * 66f,
-        rotationZ = clampedOffset * inFlightDistance * 14f,
-        scale = 1f - distance * 0.12f,
-        alpha = 1f - distance * 0.12f,
+        rotationY = 0f,
+        rotationZ = 0f,
+        scale = 1f - distance * 0.04f,
+        alpha = 1f - distance * 0.08f,
         cameraDistanceMultiplier = 8f,
-        translationXFraction = clampedOffset * inFlightDistance * 0.56f,
-        pivotFractionX = pivotFractionX,
-        zIndex = 1f - distance + inFlightDistance * 2.4f,
-        contentParallaxFraction = -clampedOffset * 0.08f,
-        contentScale = 1f + distance * 0.06f,
-        edgeShadeAlpha = distance * 0.28f,
-        edgeShadeStartFromLeft = clampedOffset < 0f,
-        shadowElevationFraction = distance * 0.8f
+        translationXFraction = 0f,
+        pivotFractionX = 0.5f,
+        zIndex = 1f - distance * 0.01f,
+        contentParallaxFraction = 0f,
+        contentScale = 1f,
+        edgeShadeAlpha = 0f,
+        edgeShadeStartFromLeft = false,
+        shadowElevationFraction = 0f
     )
 }
 

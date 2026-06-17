@@ -101,7 +101,7 @@ class BottomBarLayoutPolicyTest {
     }
 
     @Test
-    fun `kernelsu search entry collapses dock to home capsule when expanded`() {
+    fun `kernelsu search entry keeps dock wider than home capsule when expanded`() {
         val layout = resolveKernelSuBottomBarSearchLayout(
             containerWidth = 393.dp,
             itemCount = 4,
@@ -110,8 +110,8 @@ class BottomBarLayoutPolicyTest {
             searchExpanded = true
         )
 
-        assertEquals(resolveKernelSuBottomBarSearchCircleSize(), layout.dockWidth)
-        assertEquals(279.dp, layout.searchWidth)
+        assertEquals(279.dp, layout.dockWidth)
+        assertEquals(64.dp, layout.searchWidth)
         assertEquals(10.dp, layout.gap)
     }
 
@@ -273,9 +273,14 @@ class BottomBarLayoutPolicyTest {
     }
 
     @Test
-    fun `bottom search mode keeps only home as dock tab`() {
+    fun `bottom search mode preserves configured dock tabs`() {
         assertEquals(
-            listOf(BottomNavItem.HOME),
+            listOf(
+                BottomNavItem.HOME,
+                BottomNavItem.DYNAMIC,
+                BottomNavItem.HISTORY,
+                BottomNavItem.PROFILE
+            ),
             resolveBottomBarVisibleItemsForSearchMode(
                 visibleItems = listOf(
                     BottomNavItem.HOME,
@@ -287,7 +292,7 @@ class BottomBarLayoutPolicyTest {
             )
         )
         assertEquals(
-            listOf(BottomNavItem.HOME),
+            listOf(BottomNavItem.DYNAMIC, BottomNavItem.HISTORY),
             resolveBottomBarVisibleItemsForSearchMode(
                 visibleItems = listOf(BottomNavItem.DYNAMIC, BottomNavItem.HISTORY),
                 bottomBarSearchEnabled = true
@@ -534,9 +539,9 @@ class BottomBarLayoutPolicyTest {
     }
 
     @Test
-    fun `search tab click toggles bottom search only while already on home`() {
+    fun `search tab click opens search entry instead of toggling dock into compact mode`() {
         assertEquals(
-            BottomBarSearchExpansionOverride.EXPANDED,
+            null,
             resolveBottomBarSearchExpansionOverrideOnSearchClick(
                 currentItem = BottomNavItem.HOME,
                 bottomBarSearchEnabled = true,
@@ -544,7 +549,7 @@ class BottomBarLayoutPolicyTest {
             )
         )
         assertEquals(
-            BottomBarSearchExpansionOverride.COLLAPSED,
+            null,
             resolveBottomBarSearchExpansionOverrideOnSearchClick(
                 currentItem = BottomNavItem.HOME,
                 bottomBarSearchEnabled = true,

@@ -43,7 +43,6 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -58,6 +57,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.android.purebilibili.core.util.FormatUtils
 import com.android.purebilibili.data.model.response.VideoItem
+import com.android.purebilibili.feature.home.HOME_HERO_CAROUSEL_ASPECT_RATIO
 import com.android.purebilibili.feature.home.HomeHeroCarouselCardTransform
 import com.android.purebilibili.feature.home.HOME_HERO_CAROUSEL_SIDE_PEEK_DP
 import com.android.purebilibili.feature.home.resolveHomeHeroCarouselCardTransform
@@ -140,7 +140,6 @@ private fun HomeHeroCarouselCard(
     onVideoClick: () -> Unit,
     onGetPreviewUrl: suspend (String, Long) -> String?
 ) {
-    val density = LocalDensity.current
     var previewUrl by remember(video.bvid, video.cid) { mutableStateOf<String?>(null) }
     LaunchedEffect(activeForPlayback, video.bvid, video.cid) {
         if (activeForPlayback && previewUrl == null && video.bvid.isNotBlank() && video.cid > 0L) {
@@ -155,17 +154,14 @@ private fun HomeHeroCarouselCard(
         shadowElevation = (transform.shadowElevationFraction * 10f).dp,
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1.34f)
+            .aspectRatio(HOME_HERO_CAROUSEL_ASPECT_RATIO)
             .zIndex(transform.zIndex)
             .graphicsLayer {
                 transformOrigin = TransformOrigin(transform.pivotFractionX, 0.5f)
-                rotationY = transform.rotationY
-                rotationZ = transform.rotationZ
                 translationX = transform.translationXFraction * size.width
                 scaleX = transform.scale
                 scaleY = transform.scale
                 alpha = transform.alpha
-                cameraDistance = transform.cameraDistanceMultiplier * density.density * 1000f
             }
             .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onVideoClick)

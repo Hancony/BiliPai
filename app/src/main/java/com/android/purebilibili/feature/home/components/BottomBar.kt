@@ -522,19 +522,13 @@ internal fun resolveKernelSuBottomBarSearchLayout(
     val gap = 10.dp
     val availableWidth = (containerWidth - (minEdgePadding * 2)).coerceAtLeast(0.dp)
     val searchCircleSize = resolveKernelSuBottomBarSearchCircleSize()
-    val compactHomeDockSize = searchCircleSize
     val minimumDockWidth = searchCircleSize
     val collapsedSearchWidth = searchCircleSize
-    val expandedSearchWidth = minOf(
-        280.dp,
-        (availableWidth - compactHomeDockSize - gap).coerceAtLeast(176.dp)
+    val targetSearchWidth = collapsedSearchWidth
+    val targetDockWidth = minOf(
+        baseDockWidth,
+        (availableWidth - targetSearchWidth - gap).coerceAtLeast(minimumDockWidth)
     )
-    val targetSearchWidth = if (searchExpanded) expandedSearchWidth else collapsedSearchWidth
-    val targetDockWidth = if (searchExpanded) {
-        compactHomeDockSize
-    } else {
-        minOf(baseDockWidth, (availableWidth - targetSearchWidth - gap).coerceAtLeast(minimumDockWidth))
-    }
     return KernelSuBottomBarSearchLayout(
         dockWidth = targetDockWidth,
         searchWidth = targetSearchWidth,
@@ -729,8 +723,7 @@ internal fun resolveBottomBarVisibleItemsForSearchMode(
     visibleItems: List<BottomNavItem>,
     bottomBarSearchEnabled: Boolean
 ): List<BottomNavItem> {
-    if (!bottomBarSearchEnabled) return visibleItems
-    return listOf(BottomNavItem.HOME)
+    return visibleItems
 }
 
 internal enum class BottomBarSearchExpansionOverride {
@@ -768,12 +761,7 @@ internal fun resolveBottomBarSearchExpansionOverrideOnSearchClick(
     bottomBarSearchEnabled: Boolean,
     effectiveSearchExpanded: Boolean
 ): BottomBarSearchExpansionOverride? {
-    if (!bottomBarSearchEnabled || currentItem != BottomNavItem.HOME) return null
-    return if (effectiveSearchExpanded) {
-        BottomBarSearchExpansionOverride.COLLAPSED
-    } else {
-        BottomBarSearchExpansionOverride.EXPANDED
-    }
+    return null
 }
 
 internal fun shouldResetBottomBarSearchExpansionOverride(
@@ -3087,7 +3075,6 @@ private fun KernelSuAlignedBottomBar(
     }
     var searchQuery by remember { mutableStateOf("") }
     val searchLaunchMorphSpec = remember { resolveBottomBarSearchLaunchMorphSpec() }
-    var searchLaunchInProgress by remember { mutableStateOf(false) }
     val searchEnabled = resolveBottomBarSearchEnabledForItem(
         currentItem = currentItem,
         bottomBarSearchEnabled = bottomBarSearchEnabled
@@ -3118,7 +3105,7 @@ private fun KernelSuAlignedBottomBar(
         bottomBarSearchEnabled = searchEnabled,
         shouldAutoExpand = shouldAutoExpandSearch,
         expansionOverride = searchExpansionOverride
-    ) || searchLaunchInProgress
+    )
     LaunchedEffect(
         currentItem,
         searchEnabled,
@@ -3137,13 +3124,9 @@ private fun KernelSuAlignedBottomBar(
     }
     LaunchedEffect(searchLaunchKey) {
         if (searchLaunchKey <= 0 || !searchEnabled) return@LaunchedEffect
-        searchLaunchInProgress = true
-        // 搜索入口交接只推动搜索胶囊展开，避免恢复旧版底栏整体缩放造成的突兀感。
-        searchExpansionOverride = BottomBarSearchExpansionOverride.EXPANDED
         delay(searchLaunchMorphSpec.expandDurationMillis.toLong())
         onSearchLaunchTransitionFinished(searchLaunchKey)
         delay(searchLaunchMorphSpec.postHandoffResetDelayMillis)
-        searchLaunchInProgress = false
     }
     Box(
         modifier = modifier.fillMaxWidth(),
@@ -3175,7 +3158,7 @@ private fun KernelSuAlignedBottomBar(
             val dockHeight = searchLayoutState.dockHeight
             val shellHeight = searchLayoutState.shellHeight
             val dockContentAlpha by animateFloatAsState(
-                targetValue = if (effectiveSearchExpanded) 0f else 1f,
+                targetValue = 1f,
                 animationSpec = tween(
                     durationMillis = 180,
                     easing = AppMotionEasing.Continuity
@@ -3183,7 +3166,7 @@ private fun KernelSuAlignedBottomBar(
                 label = "bottomBarDockContentAlpha"
             )
             val compactHomeAlpha by animateFloatAsState(
-                targetValue = if (effectiveSearchExpanded) 1f else 0f,
+                targetValue = 0f,
                 animationSpec = tween(
                     durationMillis = 180,
                     easing = AppMotionEasing.Continuity
@@ -3675,7 +3658,7 @@ private fun KernelSuAlignedBottomBar(
                 )
 
                 KernelSuBottomBarInputLayer(
-                    visible = !effectiveSearchExpanded,
+                    visible = true,
                     visibleItems = visibleItems,
                     isTablet = isTablet,
                     hasSidebarToggle = onToggleSidebar != null,
@@ -3690,7 +3673,7 @@ private fun KernelSuAlignedBottomBar(
                     onSidebarClick = ::handleBottomBarSidebarClick
                 )
 
-                if (searchEnabled) {
+                if (searchEnabled && compactHomeAlpha > BottomBarTransientAlphaThreshold) {
                     Box(
                         modifier = Modifier
                             .matchParentSize()
