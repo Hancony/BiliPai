@@ -1184,6 +1184,8 @@ class VideoPlayerSectionPolicyTest {
 
         assertTrue(dragStartBlock.contains("startVolumeStep = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)"))
         assertTrue(volumeGestureBlock.contains("resolveSystemStreamVolumeFromGesture("))
+        assertTrue(volumeGestureBlock.contains("screenHeightPx = context.resources.displayMetrics.heightPixels.toFloat()"))
+        assertFalse(volumeGestureBlock.contains("screenHeightPx = size.height.toFloat()"))
         assertTrue(volumeGestureBlock.contains("audioManager.setStreamVolume("))
         assertTrue(volumeGestureBlock.contains("AudioManager.STREAM_MUSIC"))
         assertFalse(volumeGestureBlock.contains("playerState.player.volume ="))

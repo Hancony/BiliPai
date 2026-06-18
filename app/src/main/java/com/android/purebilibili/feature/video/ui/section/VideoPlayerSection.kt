@@ -1607,7 +1607,7 @@ fun VideoPlayerSection(
                                         startVolumeStep = startVolumeStep,
                                         maxVolumeStep = maxVolumeStep,
                                         totalDragDistanceY = totalDragDistanceY,
-                                        screenHeightPx = size.height.toFloat(),
+                                        screenHeightPx = context.resources.displayMetrics.heightPixels.toFloat(),
                                         gestureSensitivity = gestureSensitivity
                                     )
                                     audioManager.setStreamVolume(
