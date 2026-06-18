@@ -87,7 +87,8 @@ fun BottomRightControls(
             SpeedSelectionMenu(
                 currentSpeed = currentSpeed,
                 onSpeedSelected = onSpeedChange,
-                onDismiss = { showSpeedMenu = false }
+                onDismiss = { showSpeedMenu = false },
+                placement = SpeedSelectionMenuPlacement.CENTER
             )
         }
         

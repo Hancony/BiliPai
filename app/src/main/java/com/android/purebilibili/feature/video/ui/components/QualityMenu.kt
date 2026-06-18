@@ -175,27 +175,48 @@ fun QualitySelectionMenu(
  * 
  * Displays a menu for selecting playback speed.
  */
+enum class SpeedSelectionMenuPlacement {
+    CENTER,
+    RIGHT_SIDE
+}
+
 @Composable
 fun SpeedSelectionMenu(
     currentSpeed: Float,
     onSpeedSelected: (Float) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    placement: SpeedSelectionMenuPlacement
 ) {
-    val speedOptions = listOf(0.25f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f, 2.5f, 3.0f)
+    val speedOptions = PlaybackSpeed.OPTIONS.asReversed()
+    val contentAlignment = when (placement) {
+        SpeedSelectionMenuPlacement.CENTER -> Alignment.Center
+        SpeedSelectionMenuPlacement.RIGHT_SIDE -> Alignment.CenterEnd
+    }
+    val scrimColor = when (placement) {
+        SpeedSelectionMenuPlacement.CENTER -> Color.Black.copy(alpha = 0.5f)
+        SpeedSelectionMenuPlacement.RIGHT_SIDE -> Color.Transparent
+    }
 
     val menuContent: @Composable () -> Unit = {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
+                .background(scrimColor)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) { onDismiss() },
-            contentAlignment = Alignment.Center
+            contentAlignment = contentAlignment
         ) {
             Surface(
                 modifier = Modifier
+                    .then(
+                        if (placement == SpeedSelectionMenuPlacement.RIGHT_SIDE) {
+                            Modifier.padding(end = 24.dp)
+                        } else {
+                            Modifier
+                        }
+                    )
                     .widthIn(min = 180.dp, max = 240.dp)
                     .heightIn(max = 400.dp)
                     .clip(RoundedCornerShape(12.dp))
@@ -264,7 +285,8 @@ fun SpeedSelectionMenuDialog(
         SpeedSelectionMenu(
             currentSpeed = currentSpeed,
             onSpeedSelected = onSpeedSelected,
-            onDismiss = onDismiss
+            onDismiss = onDismiss,
+            placement = SpeedSelectionMenuPlacement.CENTER
         )
     }
 }

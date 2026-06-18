@@ -81,6 +81,7 @@ import com.android.purebilibili.feature.video.ui.components.AnimatedGesturePerce
 import com.android.purebilibili.feature.video.ui.components.DanmakuSettingsPanel
 import com.android.purebilibili.feature.video.ui.components.VideoAspectRatio
 import com.android.purebilibili.feature.video.ui.components.PlaybackSpeed
+import com.android.purebilibili.feature.video.ui.components.SpeedSelectionMenuPlacement
 import com.android.purebilibili.feature.video.ui.components.toFullscreenAspectRatio
 import com.android.purebilibili.feature.video.ui.components.toVideoAspectRatio
 import com.android.purebilibili.core.ui.common.copyOnLongPress
@@ -1174,29 +1175,20 @@ fun FullscreenPlayerOverlay(
         
         //  播放速度选择菜单
         if (showSpeedMenu) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .pointerInput(Unit) {
-                        detectTapGestures { showSpeedMenu = false }
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                com.android.purebilibili.feature.video.ui.components.SpeedSelectionMenu(
-                    currentSpeed = playbackSpeed,
-                    onSpeedSelected = { speed ->
-                        playbackSpeed = speed
-                        player?.setPlaybackSpeed(speed)
-                        scope.launch {
-                            SettingsManager.setLastPlaybackSpeed(context, speed)
-                        }
-                        showSpeedMenu = false
-                        lastInteractionTime = System.currentTimeMillis()
-                    },
-                    onDismiss = { showSpeedMenu = false }
-                )
-            }
+            com.android.purebilibili.feature.video.ui.components.SpeedSelectionMenu(
+                currentSpeed = playbackSpeed,
+                onSpeedSelected = { speed ->
+                    playbackSpeed = speed
+                    player?.setPlaybackSpeed(speed)
+                    scope.launch {
+                        SettingsManager.setLastPlaybackSpeed(context, speed)
+                    }
+                    showSpeedMenu = false
+                    lastInteractionTime = System.currentTimeMillis()
+                },
+                onDismiss = { showSpeedMenu = false },
+                placement = SpeedSelectionMenuPlacement.RIGHT_SIDE
+            )
         }
         
         //  视频比例选择菜单
