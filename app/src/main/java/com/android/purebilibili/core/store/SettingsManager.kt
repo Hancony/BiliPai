@@ -415,7 +415,7 @@ data class HomeSettings(
     val isBottomBarLiquidGlassEnabled: Boolean = false,
     val bottomBarLiquidGlassPreset: BottomBarLiquidGlassPreset =
         BottomBarLiquidGlassPreset.BILIPAI_TUNED,
-    val bottomBarInteractiveHighlightEnabled: Boolean = false,
+    val bottomBarInteractiveHighlightEnabled: Boolean = true,
     val isBottomBarSearchEnabled: Boolean = false,
     val bottomBarSearchAutoExpandMode: BottomBarSearchAutoExpandMode =
         BottomBarSearchAutoExpandMode.EXPAND_AT_HOME_TOP,
@@ -1202,8 +1202,7 @@ object SettingsManager {
                 preferences[KEY_BOTTOM_BAR_LIQUID_GLASS_PRESET]
                     ?: BottomBarLiquidGlassPreset.BILIPAI_TUNED.value
             ),
-            bottomBarInteractiveHighlightEnabled =
-                preferences[KEY_BOTTOM_BAR_INTERACTIVE_HIGHLIGHT_ENABLED] ?: false,
+            bottomBarInteractiveHighlightEnabled = true,
             isBottomBarSearchEnabled = preferences[KEY_BOTTOM_BAR_SEARCH_ENABLED] ?: false,
             bottomBarSearchAutoExpandMode = BottomBarSearchAutoExpandMode.fromValue(
                 preferences[KEY_BOTTOM_BAR_SEARCH_AUTO_EXPAND_MODE]
