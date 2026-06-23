@@ -107,3 +107,19 @@ internal fun resolveSettingsRootCategoryListIndex(category: SettingsRootCategory
     if (orderIndex < 0) return 0
     return 2 + orderIndex
 }
+
+internal fun isSettingsRootCategoryExpanded(
+    expandedNames: List<String>,
+    category: SettingsRootCategory
+): Boolean = category.name in expandedNames
+
+internal fun resolveSettingsRootCategoryExpandedNamesAfterToggle(
+    expandedNames: List<String>,
+    category: SettingsRootCategory
+): List<String> {
+    return if (isSettingsRootCategoryExpanded(expandedNames, category)) {
+        expandedNames - category.name
+    } else {
+        expandedNames + category.name
+    }
+}

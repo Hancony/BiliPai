@@ -62,4 +62,26 @@ class SettingsRootCategoryPolicyTest {
         assertEquals(4, resolveSettingsRootCategoryListIndex(SettingsRootCategory.PLAYBACK_INTERACTION))
         assertEquals(7, resolveSettingsRootCategoryListIndex(SettingsRootCategory.EXTENSION_ABOUT))
     }
+
+    @Test
+    fun `root category expansion starts collapsed and toggles by category name`() {
+        val empty = emptyList<String>()
+
+        assertEquals(false, isSettingsRootCategoryExpanded(empty, SettingsRootCategory.INTERFACE_HOME))
+
+        val expanded = resolveSettingsRootCategoryExpandedNamesAfterToggle(
+            expandedNames = empty,
+            category = SettingsRootCategory.INTERFACE_HOME
+        )
+        assertEquals(listOf(SettingsRootCategory.INTERFACE_HOME.name), expanded)
+        assertEquals(true, isSettingsRootCategoryExpanded(expanded, SettingsRootCategory.INTERFACE_HOME))
+
+        assertEquals(
+            empty,
+            resolveSettingsRootCategoryExpandedNamesAfterToggle(
+                expandedNames = expanded,
+                category = SettingsRootCategory.INTERFACE_HOME
+            )
+        )
+    }
 }

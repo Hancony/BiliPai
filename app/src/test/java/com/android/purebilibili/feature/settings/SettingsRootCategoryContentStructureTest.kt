@@ -86,7 +86,7 @@ class SettingsRootCategoryContentStructureTest {
             .substringBefore("item { Spacer(modifier = Modifier.height(16.dp)) }")
 
         assertFalse(rootLoopBlock.contains("SettingsCategoryHeader("))
-        assertTrue(rootLoopBlock.contains("SettingsRootCategoryContent("))
+        assertTrue(rootLoopBlock.contains("SettingsRootCategoryCollapsibleSection("))
     }
 
     @Test
@@ -108,7 +108,7 @@ class SettingsRootCategoryContentStructureTest {
     }
 
     @Test
-    fun mobileSettingsRootPinsFollowAuthorSectionAboveCategories() {
+    fun mobileSettingsRootPinsFollowAuthorSectionAboveSearchAndCategories() {
         val source = listOf(
             File("app/src/main/java/com/android/purebilibili/feature/settings/screen/SettingsScreen.kt"),
             File("src/main/java/com/android/purebilibili/feature/settings/screen/SettingsScreen.kt")
@@ -119,7 +119,26 @@ class SettingsRootCategoryContentStructureTest {
             .substringBefore("sectionOrder.forEachIndexed")
 
         assertTrue(rootListBlock.contains("FollowAuthorSection("))
-        assertTrue(rootListBlock.indexOf("FollowAuthorSection(") > rootListBlock.indexOf("SettingsSearchBarSection("))
+        assertTrue(rootListBlock.indexOf("FollowAuthorSection(") < rootListBlock.indexOf("SettingsSearchBarSection("))
+    }
+
+    @Test
+    fun mobileSettingsRootUsesCollapsibleCategorySections() {
+        val source = listOf(
+            File("app/src/main/java/com/android/purebilibili/feature/settings/ui/SettingsSections.kt"),
+            File("src/main/java/com/android/purebilibili/feature/settings/ui/SettingsSections.kt")
+        ).first { it.exists() }.readText()
+
+        val sectionBlock = source
+            .substringAfter("internal fun SettingsRootCategoryCollapsibleSection(")
+            .substringBefore("@Composable\ninternal fun SettingsSceneShortcutSection(")
+
+        assertTrue(sectionBlock.contains("text = category.title"))
+        assertTrue(sectionBlock.contains("text = category.subtitle"))
+        assertTrue(sectionBlock.contains("CupertinoIcons.Default.ChevronUp"))
+        assertTrue(sectionBlock.contains("CupertinoIcons.Default.ChevronDown"))
+        assertTrue(sectionBlock.contains("AnimatedVisibility("))
+        assertTrue(sectionBlock.contains("SettingsRootCategoryContent("))
     }
 
     @Test

@@ -629,13 +629,9 @@ fun TabletSettingsLayout(
                             .widthIn(max = layoutPolicy.rootPanelMaxWidthDp.dp)
                             .verticalScroll(rememberScrollState())
                         ) {
-                            Text(
-                                text = category.title,
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
+                            Spacer(
                                 modifier = Modifier
-                                    .padding(bottom = 24.dp, start = 16.dp)
-                                    .padding(top = layoutPolicy.detailPanePaddingDp.dp)
+                                    .height(layoutPolicy.detailPanePaddingDp.dp)
                                     .statusBarsPadding()
                             )
 
@@ -644,7 +640,15 @@ fun TabletSettingsLayout(
                                 onTwitterClick = onTwitterClick,
                                 onDonateClick = onDonateClick
                             )
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                text = category.title,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .padding(bottom = 12.dp, start = 16.dp)
+                            )
                             
                             SettingsRootCategoryContent(
                                 category = category,

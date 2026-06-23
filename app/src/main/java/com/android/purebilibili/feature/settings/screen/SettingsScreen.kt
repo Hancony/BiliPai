@@ -1289,6 +1289,7 @@ private fun MobileSettingsLayout(
         )
     }
     val sectionOrder = remember { resolveSettingsRootCategoryOrder() }
+    var expandedRootCategoryNames by rememberSaveable { mutableStateOf(emptyList<String>()) }
     val focusRequest by SettingsSearchFocusController.request.collectAsStateWithLifecycle()
     val bottomBarVisible = LocalBottomBarVisible.current
     val bottomInset = resolveSettingsContentBottomPadding(
@@ -1379,6 +1380,12 @@ private fun MobileSettingsLayout(
             return@LaunchedEffect
         }
         val category = resolveSettingsRootCategoryForSearchTarget(request.target) ?: return@LaunchedEffect
+        if (!isSettingsRootCategoryExpanded(expandedRootCategoryNames, category)) {
+            expandedRootCategoryNames = resolveSettingsRootCategoryExpandedNamesAfterToggle(
+                expandedNames = expandedRootCategoryNames,
+                category = category
+            )
+        }
         listState.animateScrollToItem(resolveSettingsRootCategoryListIndex(category))
         SettingsSearchFocusController.clear(request.token)
     }
@@ -1424,6 +1431,20 @@ private fun MobileSettingsLayout(
             contentPadding = PaddingValues(bottom = bottomInset)
         ) {
             item {
+                Box(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .entrance()
+                ) {
+                    FollowAuthorSection(
+                        onTelegramClick = onTelegramClick,
+                        onTwitterClick = onTwitterClick,
+                        onDonateClick = onDonateClick
+                    )
+                }
+            }
+
+            item {
                 SettingsSearchBarSection(
                     query = searchQuery,
                     onQueryChange = onSearchQueryChange
@@ -1439,20 +1460,6 @@ private fun MobileSettingsLayout(
                 }
                 item { Spacer(modifier = Modifier.height(16.dp)) }
             } else {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .entrance()
-                    ) {
-                        FollowAuthorSection(
-                            onTelegramClick = onTelegramClick,
-                            onTwitterClick = onTwitterClick,
-                            onDonateClick = onDonateClick
-                        )
-                    }
-                }
-
                 sectionOrder.forEachIndexed { index, section ->
                     item {
                         Box(
@@ -1460,8 +1467,19 @@ private fun MobileSettingsLayout(
                                 .padding(top = 16.dp)
                                 .entrance()
                         ) {
-                            SettingsRootCategoryContent(
+                            SettingsRootCategoryCollapsibleSection(
                                 category = section,
+                                isExpanded = isSettingsRootCategoryExpanded(
+                                    expandedRootCategoryNames,
+                                    section
+                                ),
+                                onToggleExpanded = {
+                                    expandedRootCategoryNames =
+                                        resolveSettingsRootCategoryExpandedNamesAfterToggle(
+                                            expandedNames = expandedRootCategoryNames,
+                                            category = section
+                                        )
+                                },
                                 actions = rootCategoryActions,
                                 state = rootCategoryState
                             )
