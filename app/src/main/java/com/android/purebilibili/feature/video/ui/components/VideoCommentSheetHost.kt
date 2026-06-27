@@ -248,11 +248,14 @@ internal fun resolveVideoCommentSheetPresentationProgress(
     dragVisibilityProgress: Float,
     preferDragProgress: Boolean = false
 ): Float {
+    val hostProgress = hostVisibilityProgress.coerceIn(0f, 1f)
     val dragProgress = dragVisibilityProgress.coerceIn(0f, 1f)
-    return if (preferDragProgress) {
-        dragProgress
-    } else {
-        hostVisibilityProgress.coerceIn(0f, 1f) * dragProgress
+    return when {
+        preferDragProgress -> dragProgress
+        dragProgress <= 0.001f -> 0f
+        // 关闭评论区时 drag 会跟随 host 淡出；避免 host * host 造成视频缩放回弹。
+        dragProgress + 0.001f >= hostProgress -> hostProgress
+        else -> (hostProgress * dragProgress).coerceIn(0f, 1f)
     }
 }
 

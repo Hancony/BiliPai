@@ -104,6 +104,24 @@ internal fun shouldHandlePortraitTapGesture(scale: Float): Boolean {
     return scale <= 1.01f
 }
 
+internal fun shouldEnablePortraitPagerUserScroll(
+    scale: Float,
+    commentOverlayActive: Boolean
+): Boolean {
+    return shouldHandlePortraitTapGesture(scale = scale) && !commentOverlayActive
+}
+
+internal fun shouldBlockPortraitPagerScrollForCommentOverlay(
+    commentSheetVisible: Boolean,
+    subReplyVisible: Boolean,
+    commentVisibilityProgress: Float,
+    progressEpsilon: Float = 0.001f
+): Boolean {
+    return commentSheetVisible ||
+        subReplyVisible ||
+        commentVisibilityProgress > progressEpsilon
+}
+
 internal fun shouldHandlePortraitLongPressGesture(scale: Float): Boolean {
     return scale <= 1.01f
 }

@@ -928,9 +928,17 @@ fun PortraitVideoPager(
         )
     }
 
+    var portraitCommentOverlayActive by remember { mutableStateOf(false) }
+    LaunchedEffect(pagerState.currentPage) {
+        portraitCommentOverlayActive = false
+    }
+
     VerticalPager(
         state = pagerState,
-        userScrollEnabled = shouldHandlePortraitTapGesture(scale = currentPageScale),
+        userScrollEnabled = shouldEnablePortraitPagerUserScroll(
+            scale = currentPageScale,
+            commentOverlayActive = portraitCommentOverlayActive
+        ),
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
@@ -980,6 +988,11 @@ fun PortraitVideoPager(
                 onCurrentPageScaleChange = { scale ->
                     if (page == pagerState.currentPage) {
                         currentPageScale = scale
+                    }
+                },
+                onCommentOverlayActiveChange = { active ->
+                    if (page == pagerState.currentPage) {
+                        portraitCommentOverlayActive = active
                     }
                 },
                 portraitOverlayVisible = portraitOverlayVisible,
@@ -1034,6 +1047,7 @@ private fun VideoPageItem(
     hasRenderedFirstFrame: Boolean,
     initialProgressPositionMs: Long,
     onCurrentPageScaleChange: (Float) -> Unit,
+    onCommentOverlayActiveChange: (Boolean) -> Unit = {},
     portraitOverlayVisible: Boolean,
     onPortraitOverlayVisibleChange: (Boolean) -> Unit,
     onRequestVideoChange: (String) -> Unit
@@ -1240,6 +1254,7 @@ private fun VideoPageItem(
     var showDetailSheet by remember { mutableStateOf(false) }
     var detailSheetUpOnlyMode by remember { mutableStateOf(false) }
     var commentSheetVisibilityProgress by remember { mutableFloatStateOf(0f) }
+    val subReplyState by commentViewModel.subReplyState.collectAsStateWithLifecycle()
     var portraitPageWidthPx by remember { mutableIntStateOf(0) }
     var portraitPageHeightPx by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
@@ -1264,7 +1279,23 @@ private fun VideoPageItem(
             showCommentSheet = false
             showDetailSheet = false
             commentSheetVisibilityProgress = 0f
+            onCommentOverlayActiveChange(false)
         }
+    }
+
+    LaunchedEffect(
+        isCurrentPage,
+        showCommentSheet,
+        subReplyState.visible,
+        commentSheetVisibilityProgress
+    ) {
+        onCommentOverlayActiveChange(
+            isCurrentPage && shouldBlockPortraitPagerScrollForCommentOverlay(
+                commentSheetVisible = showCommentSheet,
+                subReplyVisible = subReplyState.visible,
+                commentVisibilityProgress = commentSheetVisibilityProgress
+            )
+        )
     }
 
     // 进度状态 (从播放器获取)

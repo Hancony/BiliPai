@@ -356,6 +356,24 @@ class VideoCommentSheetHostPolicyTest {
     }
 
     @Test
+    fun `sheet presentation progress avoids squared host fade on exit`() {
+        assertEquals(
+            0.4f,
+            resolveVideoCommentSheetPresentationProgress(
+                hostVisibilityProgress = 0.4f,
+                dragVisibilityProgress = 0.4f
+            )
+        )
+        assertEquals(
+            0f,
+            resolveVideoCommentSheetPresentationProgress(
+                hostVisibilityProgress = 0f,
+                dragVisibilityProgress = 0f
+            )
+        )
+    }
+
+    @Test
     fun `host exit visibility follows host fade instead of snapping drag progress to expanded`() {
         assertEquals(
             0.4f,

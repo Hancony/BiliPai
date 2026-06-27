@@ -85,6 +85,53 @@ class PortraitPagerSwitchPolicyTest {
     }
 
     @Test
+    fun shouldEnablePortraitPagerUserScroll_blocksWhenCommentOverlayActive() {
+        assertFalse(
+            shouldEnablePortraitPagerUserScroll(
+                scale = 1f,
+                commentOverlayActive = true
+            )
+        )
+        assertTrue(
+            shouldEnablePortraitPagerUserScroll(
+                scale = 1f,
+                commentOverlayActive = false
+            )
+        )
+        assertFalse(
+            shouldEnablePortraitPagerUserScroll(
+                scale = 1.2f,
+                commentOverlayActive = false
+            )
+        )
+    }
+
+    @Test
+    fun shouldBlockPortraitPagerScrollForCommentOverlay_tracksSheetAndThreadStates() {
+        assertTrue(
+            shouldBlockPortraitPagerScrollForCommentOverlay(
+                commentSheetVisible = false,
+                subReplyVisible = true,
+                commentVisibilityProgress = 0f
+            )
+        )
+        assertTrue(
+            shouldBlockPortraitPagerScrollForCommentOverlay(
+                commentSheetVisible = true,
+                subReplyVisible = false,
+                commentVisibilityProgress = 0f
+            )
+        )
+        assertFalse(
+            shouldBlockPortraitPagerScrollForCommentOverlay(
+                commentSheetVisible = false,
+                subReplyVisible = false,
+                commentVisibilityProgress = 0f
+            )
+        )
+    }
+
+    @Test
     fun shouldHandlePortraitLongPressGesture_disablesLongPressWhenZoomed() {
         assertFalse(
             shouldHandlePortraitLongPressGesture(scale = 1.08f)
