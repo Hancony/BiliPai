@@ -6,7 +6,7 @@ internal fun resolveBiliPaiPredictiveBackAnimationHandler(
     routeTransition: BiliPaiNavRouteTransition,
     predictiveBackEnabled: Boolean = true,
     style: BiliPaiPredictiveBackAnimationStyle = BiliPaiPredictiveBackAnimationStyle.SCALE,
-    exitDirection: BiliPaiPredictiveBackExitDirection = BiliPaiPredictiveBackExitDirection.FOLLOW_GESTURE,
+    exitDirection: BiliPaiPredictiveBackExitDirection = BiliPaiPredictiveBackExitDirection.ALWAYS_RIGHT,
 ): BiliPaiPredictiveBackAnimationHandler {
     if (routeTransition == BiliPaiNavRouteTransition.NO_OP_SHARED_ELEMENT) {
         return BiliPaiSharedElementPredictiveBackAnimation()
@@ -30,7 +30,8 @@ private fun resolveClassicCardPredictiveBackHandler(
     exitDirection: BiliPaiPredictiveBackExitDirection,
 ): BiliPaiPredictiveBackAnimationHandler {
     return when (style) {
-        BiliPaiPredictiveBackAnimationStyle.DEFAULT,
+        BiliPaiPredictiveBackAnimationStyle.DEFAULT ->
+            BiliPaiDefaultPredictiveBackAnimation()
         BiliPaiPredictiveBackAnimationStyle.SCALE ->
             BiliPaiScalePredictiveBackAnimation(exitDirection)
         BiliPaiPredictiveBackAnimationStyle.AOSP ->

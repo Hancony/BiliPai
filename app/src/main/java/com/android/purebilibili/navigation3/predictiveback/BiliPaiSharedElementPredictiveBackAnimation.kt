@@ -4,10 +4,13 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation3.scene.Scene
-import androidx.navigation3.ui.defaultPopTransitionSpec
 import androidx.navigation3.ui.defaultTransitionSpec
 
 import androidx.navigationevent.NavigationEventTransitionState
@@ -29,8 +32,14 @@ internal class BiliPaiSharedElementPredictiveBackAnimation : BiliPaiPredictiveBa
     override fun AnimatedContentTransitionScope<Scene<BiliPaiNavKey>>.onPredictivePopTransitionSpec(
         swipeEdge: Int,
     ): ContentTransform = ContentTransform(
-        targetContentEnter = EnterTransition.None,
-        initialContentExit = ExitTransition.None,
+        targetContentEnter = slideInHorizontally(
+            initialOffsetX = { -it / 4 },
+            animationSpec = tween(durationMillis = 550, easing = LinearEasing),
+        ),
+        initialContentExit = slideOutHorizontally(
+            targetOffsetX = { it },
+            animationSpec = tween(durationMillis = 550, easing = LinearEasing),
+        ),
         sizeTransform = null,
     )
 

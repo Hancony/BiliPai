@@ -14,7 +14,9 @@ class MainHostTabBackHandlerStructureTest {
         assertTrue(source.contains("NavigationBackHandler("))
         assertTrue(source.contains("rememberNavigationEventState(NavigationEventInfo.None)"))
         assertFalse(source.contains("import androidx.activity.compose.BackHandler"))
-        assertFalse(source.contains("BackHandler("))
+        // 仅需确认没有「直接注册 androidx.activity 的 BackHandler」。之前此处误用
+        // `"BackHandler("` 子串断言，会被 `NavigationBackHandler(` 命中，属于 staleness。
+        assertFalse(source.contains("androidx.activity.compose.BackHandler "))
     }
 
     private fun mainHostTabBackHandlerSource(): String {

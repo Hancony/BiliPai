@@ -22,6 +22,7 @@ import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigation3.ui.NavDisplay
+import androidx.navigation3.ui.NavDisplayTransitionEffects
 import androidx.navigation3.scene.SceneInfo
 import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.scene.rememberSceneState
@@ -32,6 +33,7 @@ import com.android.purebilibili.core.ui.ProvideAnimatedVisibilityScope
 import com.android.purebilibili.core.ui.transition.LocalVideoCardSharedElementSourceRoute
 import com.android.purebilibili.navigation3.predictiveback.BiliPaiPredictiveBackAnimationHandler
 import com.android.purebilibili.navigation3.predictiveback.BiliPaiPredictiveBackAnimationStyle
+import com.android.purebilibili.navigation3.predictiveback.BiliPaiPredictiveBackExitDirection
 import com.android.purebilibili.navigation3.predictiveback.resolveBiliPaiPredictiveBackAnimationHandler
 import kotlinx.coroutines.launch
 
@@ -41,6 +43,7 @@ internal fun BiliPaiNavDisplayHost(
     cardTransitionEnabled: Boolean = true,
     predictiveBackEnabled: Boolean = true,
     predictiveBackAnimationStyle: BiliPaiPredictiveBackAnimationStyle = BiliPaiPredictiveBackAnimationStyle.SCALE,
+    predictiveBackExitDirection: BiliPaiPredictiveBackExitDirection = BiliPaiPredictiveBackExitDirection.ALWAYS_RIGHT,
     sourceMetadata: BiliPaiNavSourceMetadata,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -67,19 +70,22 @@ internal fun BiliPaiNavDisplayHost(
         popRouteTransition,
         predictiveBackEnabled,
         predictiveBackAnimationStyle,
+        predictiveBackExitDirection,
     ) {
         resolveBiliPaiPredictiveBackAnimationHandler(
             routeTransition = popRouteTransition,
             predictiveBackEnabled = predictiveBackEnabled,
             style = predictiveBackAnimationStyle,
+            exitDirection = predictiveBackExitDirection,
         )
     }
-    val performBack: () -> Unit = {
+    val performBack: (() -> Unit) -> Unit = { commitTransitionCallBack ->
         navigationScope.launch {
             predictiveBackHandler.onBackPressed(
                 transitionState = navigationEventState?.transitionState,
                 currentPageKey = safeBackStack.lastOrNull(),
             )
+            commitTransitionCallBack()
             onBack()
         }
     }
@@ -140,7 +146,7 @@ internal fun BiliPaiNavDisplayHost(
         sceneStrategies = listOf(SinglePaneSceneStrategy()),
         sceneDecoratorStrategies = emptyList(),
         sharedTransitionScope = sharedTransitionScope,
-        onBack = performBack
+        onBack = { performBack { } }
     )
     val scene = sceneState.currentScene
     val currentInfo = SceneInfo(scene)
@@ -162,6 +168,7 @@ internal fun BiliPaiNavDisplayHost(
         modifier = modifier,
         contentAlignment = Alignment.TopStart,
         sizeTransform = null,
+        transitionEffects = NavDisplayTransitionEffects(blockInputDuringTransition = true),
         transitionSpec = {
             with(predictiveBackHandler) {
                 onTransitionSpec()

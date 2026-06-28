@@ -26,7 +26,12 @@ class BiliPaiNavDisplayHostStructureTest {
         val buildFile = buildFileSource()
 
         assertTrue(buildFile.contains("androidx.lifecycle:lifecycle-viewmodel-navigation3:"))
-        assertTrue(buildFile.contains("androidx.navigationevent:navigationevent-compose:1.1.1"))
+        // 上游 navigationevent-compose 被 Gradle exclude 掉，转而使用项目内 vendored 源码
+        // (app/src/main/java/androidx/navigationevent/compose/)，以便在 onBackCompleted 回调
+        // 内对 transitionState 提交时序做精确控制。
+        assertTrue(buildFile.contains("exclude(group = \"androidx.navigationevent\", module = \"navigationevent-compose\")"))
+        assertFalse(buildFile.contains("androidx.navigationevent:navigationevent-compose:"))
+        assertFalse(buildFile.contains("androidx.navigationevent:navigationevent-compose"))
         assertTrue(source.contains("rememberDecoratedNavEntries("))
         assertTrue(source.contains("rememberSceneState("))
         assertTrue(source.contains("rememberSaveableStateHolderNavEntryDecorator"))
@@ -59,7 +64,7 @@ class BiliPaiNavDisplayHostStructureTest {
         val source = navDisplayHostSource()
 
         assertTrue(source.contains("NavDisplay("))
-        assertTrue(source.contains("onBack = performBack"))
+        assertTrue(source.contains("onBack = { performBack { } }"))
         assertTrue(source.contains("onBack()"))
         assertFalse(source.contains("import androidx.activity.compose.BackHandler"))
         assertFalse(source.contains("BackHandler(enabled"))

@@ -294,6 +294,14 @@ internal fun resolveForceCoverOnlyForReturn(
     return forceCoverOnlyOnReturn || isReturningFromDetail
 }
 
+internal fun shouldUseReturningVideoDetailVisualState(
+    forceCoverOnlyForReturn: Boolean,
+    isReturningFromDetail: Boolean,
+    isExitTransitionInProgress: Boolean
+): Boolean {
+    return forceCoverOnlyForReturn || isReturningFromDetail
+}
+
 internal fun resolveCoverTakeoverDelayBeforeBackNavigationMillis(): Long {
     return COVER_TAKEOVER_PRE_BACK_DELAY_MILLIS
 }
@@ -1755,6 +1763,11 @@ fun VideoDetailScreen(
         transitionEnabled = transitionEnabled,
         detailShellSharedBoundsEnabled = detailShellSharedBoundsEnabled
     )
+    val useReturningVideoDetailVisualState = shouldUseReturningVideoDetailVisualState(
+        forceCoverOnlyForReturn = forceCoverOnlyForReturn,
+        isReturningFromDetail = isReturningFromDetail,
+        isExitTransitionInProgress = isExitTransitionInProgress
+    )
 
     val handleTopBarAction = remember(
         miniPlayerManager,
@@ -2430,9 +2443,7 @@ fun VideoDetailScreen(
         autoEnterPortraitFromRoute,
         initialVerticalFromRoute,
         isVerticalVideo,
-        forceCoverOnlyForReturn,
-        isReturningFromDetail,
-        isExitTransitionInProgress
+        useReturningVideoDetailVisualState
     ) {
         resolveVideoSharedTransitionVisualSpec(
             sourceRoute = sourceRouteForSharedElement,
@@ -2442,7 +2453,7 @@ fun VideoDetailScreen(
             autoPortrait = autoEnterPortraitFromRoute,
             initialVertical = initialVerticalFromRoute,
             isVerticalVideo = isVerticalVideo,
-            isReturning = forceCoverOnlyForReturn || isReturningFromDetail || isExitTransitionInProgress
+            isReturning = useReturningVideoDetailVisualState
         )
     }
     LaunchedEffect(
@@ -3469,7 +3480,7 @@ fun VideoDetailScreen(
                             Modifier
                         }
 
-                        val isLeaving = isReturningFromDetail || isExitTransitionInProgress
+                        val isLeaving = useReturningVideoDetailVisualState
                         val returnAlphaDurationMillis = if (homeSharedTransitionMotionSpec.enabled) {
                             homeSharedTransitionMotionSpec.durationMillis
                         } else {

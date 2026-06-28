@@ -43,7 +43,7 @@ internal fun resolveHomePullRefreshIndicatorStyle(
     return when {
         uiPreset == UiPreset.MD3 &&
             androidNativeVariant == AndroidNativeVariant.MATERIAL3 -> {
-            HomePullRefreshIndicatorStyle.MD3_SCREENSHOT_HANDLE
+            HomePullRefreshIndicatorStyle.MATERIAL_DEFAULT
         }
         uiPreset == UiPreset.MD3 &&
             androidNativeVariant == AndroidNativeVariant.MIUIX -> {

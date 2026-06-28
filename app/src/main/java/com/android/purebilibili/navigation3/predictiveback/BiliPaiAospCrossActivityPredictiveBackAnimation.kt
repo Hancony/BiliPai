@@ -15,6 +15,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -96,7 +97,13 @@ internal class BiliPaiAospCrossActivityPredictiveBackAnimation(
         }
 
         if (pageKey == currentPageKey.toString()) {
-            inPredictiveBackAnimation = animatedScale != 1f
+            // 同 BiliPaiScalePredictiveBackAnimation：把 inPredictiveBackAnimation 写入推迟到
+            // SideEffect，避免 PostExit 每帧在 composition body 里 back-write
+            // snapshot state 触发本帧下游整片失效（与 PostExit 抖动卡顿直接相关）。
+            val predictiveNow = animatedScale != 1f
+            SideEffect {
+                inPredictiveBackAnimation = predictiveNow
+            }
         }
 
         val directionMultiplier = when (exitDirection) {

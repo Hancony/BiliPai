@@ -11,6 +11,12 @@ import androidx.navigationevent.compose.rememberNavigationEventState
  *
  * 使用 [NavigationBackHandler] 替代 [androidx.activity.compose.BackHandler]，
  * 以保留系统预测性返回手势预览。
+ *
+ * 关键：回首页走立即落地（snap）路径而非横向滚动动画（animate）。
+ * 预测式返回手势在被系统执行 commit 时，HorizontalPager 内部常因上一帧的惯性测量
+ * 竞争产生小数偏移，而 animateToPage 基于该小数偏移计算 scrollPixels，会落到相邻页』；
+ * snapToPage 路径 awaitScrollIdle 后才 scrollToPage，绕开偏移读数，与 VideoDetail
+ * onHomeClick 已验证的回首页链路完全一致。
  */
 @Composable
 internal fun MainHostTabBackHandler(

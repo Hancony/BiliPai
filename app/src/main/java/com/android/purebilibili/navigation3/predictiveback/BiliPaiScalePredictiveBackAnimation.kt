@@ -15,6 +15,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -87,7 +88,15 @@ internal class BiliPaiScalePredictiveBackAnimation(
                 }
             }
 
-            inPredictiveBackAnimation = animatedScale != 1f
+            // 关键：之前在 composition body 里直接 `inPredictiveBackAnimation = animatedScale != 1f`
+            // 会在 PostExit 取消防越界起始的每一帧来回 back-write，整个 leaf screen 的 modifier
+            // 链（及下游 entry）随值抖动一并 invalidate 一次 composition。改为延迟到本帧
+            // Composition 完成后（SideEffect）再写，写动作不再影响正在进行的 Composition
+            // 的 ReadBack 分支；读取侧也只看当前的稳定布尔值，下一帧才检视。
+            val isCurrentlyPredictive = animatedScale != 1f
+            SideEffect {
+                inPredictiveBackAnimation = isCurrentlyPredictive
+            }
 
             val progressInProgress = transitionState as? InProgress
             val edge = progressInProgress?.latestEvent?.swipeEdge ?: 0
@@ -106,7 +115,7 @@ internal class BiliPaiScalePredictiveBackAnimation(
             }
             val exitProgress = if (pageKey != currentPageKey.toString()) 1f else exitAnimatable.value
             val animatedTranslationX = containerWidthPx * exitProgress * directionMultiplier
-            val needsClip = inPredictiveBackAnimation || exitingPageKey != null
+            val needsClip = isCurrentlyPredictive || exitingPageKey != null
 
             this
                 .graphicsLayer {

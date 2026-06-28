@@ -77,6 +77,35 @@ class VideoDetailReturnCoverPolicyTest {
     }
 
     @Test
+    fun `predictive exit alone does not switch detail into returning visual state`() {
+        assertFalse(
+            shouldUseReturningVideoDetailVisualState(
+                forceCoverOnlyForReturn = false,
+                isReturningFromDetail = false,
+                isExitTransitionInProgress = true
+            )
+        )
+    }
+
+    @Test
+    fun `explicit return state switches detail into returning visual state`() {
+        assertTrue(
+            shouldUseReturningVideoDetailVisualState(
+                forceCoverOnlyForReturn = true,
+                isReturningFromDetail = false,
+                isExitTransitionInProgress = false
+            )
+        )
+        assertTrue(
+            shouldUseReturningVideoDetailVisualState(
+                forceCoverOnlyForReturn = false,
+                isReturningFromDetail = true,
+                isExitTransitionInProgress = false
+            )
+        )
+    }
+
+    @Test
     fun `cover takeover delay keeps a one-frame budget before back navigation`() {
         assertEquals(16L, resolveCoverTakeoverDelayBeforeBackNavigationMillis())
     }

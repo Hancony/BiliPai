@@ -2572,7 +2572,7 @@ fun AppNavigation(
                     onReturnToHomeTab = {
                         val homeIndex = visibleBottomBarItems.indexOf(BottomNavItem.HOME)
                         if (homeIndex >= 0) {
-                            mainBottomPagerState.animateToPage(homeIndex)
+                            mainBottomPagerState.snapToPage(homeIndex)
                         }
                     },
                 )

@@ -40,9 +40,9 @@ class HomePullRefreshUiPolicyTest {
     }
 
     @Test
-    fun `pull refresh indicator style routes md3 screenshot and miuix legacy material separately`() {
+    fun `pull refresh indicator style routes native material and miuix separately`() {
         assertEquals(
-            HomePullRefreshIndicatorStyle.MD3_SCREENSHOT_HANDLE,
+            HomePullRefreshIndicatorStyle.MATERIAL_DEFAULT,
             resolveHomePullRefreshIndicatorStyle(
                 uiPreset = UiPreset.MD3,
                 androidNativeVariant = AndroidNativeVariant.MATERIAL3

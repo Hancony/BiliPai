@@ -1584,15 +1584,16 @@ fun HomeScreen(
                                  modifier = Modifier
                                      .fillMaxSize()
                                      .zIndex(0f)
-                                     .graphicsLayer {
-                                         translationY = if (
-                                             pullRefreshIndicatorStyle == HomePullRefreshIndicatorStyle.MIUIX_NATIVE
-                                         ) {
-                                             0f
-                                         } else {
-                                             calculateDragOffset()
-                                         }
-                                     }
+                                      .graphicsLayer {
+                                          translationY = if (
+                                              pullRefreshIndicatorStyle == HomePullRefreshIndicatorStyle.MIUIX_NATIVE ||
+                                              pullRefreshIndicatorStyle == HomePullRefreshIndicatorStyle.MATERIAL_DEFAULT
+                                          ) {
+                                              0f
+                                          } else {
+                                              calculateDragOffset()
+                                          }
+                                      }
                              ) {
                              if (category != HomeCategory.POPULAR && categoryState.isLoading && categoryState.videos.isEmpty() && categoryState.liveRooms.isEmpty()) {
                                  // Loading Skeleton per page

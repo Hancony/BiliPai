@@ -29,6 +29,10 @@ fun String.toBuildConfigStringLiteral(): String {
     return "\"$escaped\""
 }
 
+configurations.all {
+    exclude(group = "androidx.navigationevent", module = "navigationevent-compose")
+}
+
 val debugVerboseLogsEnabled = providers.gradleProperty("bili.debug.verboseLogs")
     .map(String::toBoolean)
     .orElse(false)
@@ -81,8 +85,8 @@ android {
         targetSdk = 35  // 保持35以避免Android 16的新运行时行为
         // 🔥🔥 [版本号] 发布新版前记得更新！格式：versionCode +1, versionName 递增
         // 更新日志：CHANGELOG.md
-        versionCode = 242
-        versionName = "9.7.0"
+        versionCode = 243
+        versionName = "9.7.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -331,8 +335,19 @@ dependencies {
     
     // --- 3.6 Navigation3 (Compose 自有返回栈与预测性返回迁移层) ---
     implementation("androidx.navigation3:navigation3-runtime:1.1.1")
-    implementation("androidx.navigation3:navigation3-ui:1.1.1")
-    implementation("androidx.navigationevent:navigationevent-compose:1.1.1")
+    // navigation3-ui 使用 Miuix fork：在 androidx 同包名下提供 NavDisplayTransitionEffects
+    // (blockInputDuringTransition / enableCornerClip / dimAmount)，与 InstallerX 对齐，
+    // 在转场期间屏蔽触摸拦截以消除预测性返回手势冲突。runtime/event 仍用 androidx 1.1.1。
+    implementation("top.yukonga.miuix.kmp:miuix-navigation3-ui-android:$miuixVersion") {
+        exclude(group = "androidx.navigationevent", module = "navigationevent-compose")
+        exclude(group = "org.jetbrains.androidx.navigationevent", module = "navigationevent-compose")
+    }
+    // 预测式返回：使用本地 vendored 版 androidx.navigationevent.compose（位于
+    // app/src/main/java/androidx/navigationevent/compose/），以便在 onBackCompleted 里
+    // 把 transitionState 的提交延迟到用户回调内执行，保证 scale/aosp 退出动画能在
+    // InProgress 状态下读取到最新手势数据。下面排除上游同 group 的 compose 产物，避免与
+    // 本地源码冲突。
+    implementation("androidx.navigationevent:navigationevent:1.1.1")
     
     // --- 3.7 Startup (应用初始化) ---
     implementation("androidx.startup:startup-runtime:1.2.0")
