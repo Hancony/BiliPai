@@ -84,6 +84,20 @@ class MiuixV2MigrationStructureTest {
     }
 
     @Test
+    fun buildGradle_includesMiuixIconsArtifact() {
+        val source = loadSource("app/build.gradle.kts")
+        assertTrue(source.contains("miuix-icons-android"))
+    }
+
+    @Test
+    fun md3SegmentedControl_routesMiuixVariantToTabRow() {
+        val source = loadSource("app/src/main/java/com/android/purebilibili/feature/settings/IOSSlidingSegmentedControl.kt")
+        assertTrue(source.contains("resolveMd3SegmentedControlRenderer("))
+        assertTrue(source.contains("MiuixTabRowSegmentedControl("))
+        assertTrue(source.contains("MiuixTabRow("))
+    }
+
+    @Test
     fun adaptivePullToRefreshBox_routesMiuixVariantToMiuixPullToRefresh() {
         val source = loadSource("app/src/main/java/com/android/purebilibili/core/ui/AdaptivePullToRefreshBox.kt")
         assertTrue(source.contains("MiuixPullToRefresh("))

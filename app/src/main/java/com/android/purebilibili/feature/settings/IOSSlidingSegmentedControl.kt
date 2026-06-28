@@ -39,6 +39,8 @@ import com.android.purebilibili.feature.home.components.BOTTOM_BAR_LIQUID_SEGMEN
 import com.android.purebilibili.feature.home.components.BOTTOM_BAR_LIQUID_SEGMENTED_CONTROL_INDICATOR_HEIGHT_DP
 import com.android.purebilibili.feature.home.components.BottomBarLiquidSegmentedControl
 import com.kyant.backdrop.Backdrop
+import top.yukonga.miuix.kmp.basic.TabRow as MiuixTabRow
+import top.yukonga.miuix.kmp.basic.TabRowDefaults as MiuixTabRowDefaults
 
 internal fun resolveMd3SegmentedLabelFontSizeSp(
     optionCount: Int,
@@ -207,9 +209,6 @@ private fun <T> Md3SegmentedControl(
     enabled: Boolean = true,
     onSelectionChange: (T) -> Unit
 ) {
-    val longestLabelLength = remember(options) {
-        options.maxOfOrNull { it.label.length } ?: 0
-    }
     val androidNativeVariant = LocalAndroidNativeVariant.current
     val materialColorScheme = MaterialTheme.colorScheme
     val colorTokens = resolveMd3SegmentedControlColorTokens(
@@ -223,18 +222,101 @@ private fun <T> Md3SegmentedControl(
         miuixSurfaceContainerHigh = AppSurfaceTokens.surfaceContainerHigh(),
         miuixOnSurfaceVariantSummary = AppSurfaceTokens.onSurfaceVariantSummary()
     )
-    val labelFontSize = remember(options.size, longestLabelLength) {
-        resolveMd3SegmentedLabelFontSizeSp(
-            optionCount = options.size,
-            longestLabelLength = longestLabelLength
-        ).sp
-    }
     val uiPreset = LocalUiPreset.current
     val pillCornerRadius = AppShapes.resolveContainerCornerDp(
         level = ContainerLevel.Pill,
         uiPreset = uiPreset,
         androidNativeVariant = androidNativeVariant
     )
+    when (resolveMd3SegmentedControlRenderer(androidNativeVariant)) {
+        Md3SegmentedControlRenderer.MIUIX_TAB_ROW -> {
+            MiuixTabRowSegmentedControl(
+                options = options,
+                selectedValue = selectedValue,
+                enabled = enabled,
+                colorTokens = colorTokens,
+                pillCornerRadius = pillCornerRadius,
+                modifier = modifier,
+                onSelectionChange = onSelectionChange
+            )
+        }
+        Md3SegmentedControlRenderer.MATERIAL_SEGMENTED_BUTTONS -> {
+            MaterialMd3SegmentedControl(
+                options = options,
+                selectedValue = selectedValue,
+                enabled = enabled,
+                colorTokens = colorTokens,
+                pillCornerRadius = pillCornerRadius,
+                modifier = modifier,
+                onSelectionChange = onSelectionChange
+            )
+        }
+    }
+}
+
+@Composable
+private fun <T> MiuixTabRowSegmentedControl(
+    options: List<PlaybackSegmentOption<T>>,
+    selectedValue: T,
+    enabled: Boolean,
+    colorTokens: Md3SegmentedControlColorTokens,
+    pillCornerRadius: Dp,
+    modifier: Modifier = Modifier,
+    onSelectionChange: (T) -> Unit
+) {
+    val selectedIndex = resolveSelectionIndex(options = options, selectedValue = selectedValue)
+    val tabRowColors = resolveMiuixSegmentedTabRowColors(colorTokens)
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .adaptiveSquircleBackground(
+                color = colorTokens.outerContainerColor,
+                cornerRadius = pillCornerRadius
+            )
+            .padding(4.dp)
+    ) {
+        MiuixTabRow(
+            tabs = options.map { it.label },
+            selectedTabIndex = selectedIndex,
+            onTabSelected = { index ->
+                if (!enabled) return@MiuixTabRow
+                options.getOrNull(index)?.let { option ->
+                    onSelectionChange(option.value)
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = MiuixTabRowDefaults.tabRowColors(
+                backgroundColor = tabRowColors.backgroundColor,
+                contentColor = tabRowColors.contentColor,
+                selectedBackgroundColor = tabRowColors.selectedBackgroundColor,
+                selectedContentColor = tabRowColors.selectedContentColor
+            ),
+            height = 40.dp,
+            cornerRadius = pillCornerRadius,
+            itemSpacing = 4.dp
+        )
+    }
+}
+
+@Composable
+private fun <T> MaterialMd3SegmentedControl(
+    options: List<PlaybackSegmentOption<T>>,
+    selectedValue: T,
+    enabled: Boolean,
+    colorTokens: Md3SegmentedControlColorTokens,
+    pillCornerRadius: Dp,
+    modifier: Modifier = Modifier,
+    onSelectionChange: (T) -> Unit
+) {
+    val longestLabelLength = remember(options) {
+        options.maxOfOrNull { it.label.length } ?: 0
+    }
+    val labelFontSize = remember(options.size, longestLabelLength) {
+        resolveMd3SegmentedLabelFontSizeSp(
+            optionCount = options.size,
+            longestLabelLength = longestLabelLength
+        ).sp
+    }
     Box(
         modifier = modifier
             .fillMaxWidth()
