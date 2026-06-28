@@ -655,10 +655,12 @@ fun BottomBarLiquidSegmentedControl(
                 motionProgress = motionProgress,
                 selectionEmphasis = refractionMotionProfile.exportSelectionEmphasis,
                 selectedTextColor = selectedTextColor,
-                unselectedTextColor = selectedTextColor,
+                unselectedTextColor = unselectedTextColor,
                 enabled = enabled,
                 labelFontSize = labelFontSize,
                 indicatorCorner = indicatorCorner,
+                liquidGlassEnabled = liquidGlassEnabled,
+                isExportLayer = true,
                 onSelected = onSelected,
                 interactive = false,
                 modifier = Modifier
@@ -702,6 +704,8 @@ fun BottomBarLiquidSegmentedControl(
             enabled = enabled,
             labelFontSize = labelFontSize,
             indicatorCorner = indicatorCorner,
+            liquidGlassEnabled = liquidGlassEnabled,
+            isExportLayer = false,
             onSelected = onSelected,
             interactive = false,
             modifier = Modifier
@@ -721,6 +725,8 @@ fun BottomBarLiquidSegmentedControl(
             enabled = enabled,
             labelFontSize = labelFontSize,
             indicatorCorner = indicatorCorner,
+            liquidGlassEnabled = liquidGlassEnabled,
+            isExportLayer = false,
             onSelected = ::selectFromTap,
             interactive = true,
             onPressChanged = dragState::setPressed,
@@ -822,6 +828,8 @@ private fun BottomBarLiquidSegmentedLabels(
     enabled: Boolean,
     labelFontSize: TextUnit,
     indicatorCorner: Dp,
+    liquidGlassEnabled: Boolean,
+    isExportLayer: Boolean,
     onSelected: (Int) -> Unit,
     interactive: Boolean,
     onPressChanged: ((Boolean) -> Unit)? = null,
@@ -847,11 +855,22 @@ private fun BottomBarLiquidSegmentedLabels(
                 selectionEmphasis = selectionEmphasis
             )
             val textColor = if (enabled) {
-                androidx.compose.ui.graphics.lerp(
-                    start = unselectedTextColor,
-                    stop = selectedTextColor,
-                    fraction = visual.themeWeight
-                )
+                if (isExportLayer) {
+                    resolveBottomBarGlassExportContentColor(
+                        unselectedColor = unselectedTextColor,
+                        selectedColor = selectedTextColor,
+                        themeWeight = visual.themeWeight,
+                        glassEnabled = liquidGlassEnabled
+                    )
+                } else {
+                    resolveBottomBarGlassVisibleContentColor(
+                        unselectedColor = unselectedTextColor,
+                        selectedColor = selectedTextColor,
+                        themeWeight = visual.themeWeight,
+                        glassEnabled = liquidGlassEnabled,
+                        indicatorProgress = motionProgress
+                    )
+                }
             } else {
                 unselectedTextColor.copy(alpha = 0.44f)
             }

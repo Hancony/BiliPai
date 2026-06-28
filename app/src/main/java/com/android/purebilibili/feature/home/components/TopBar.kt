@@ -1098,6 +1098,9 @@ private fun LightweightHomeTopTabs(
             ) &&
             shouldUseLiquidGlassIndicator &&
             hasOuterChromeSurface
+        val usesSharedCapsuleIndicator = shouldUseMovingIosCapsule ||
+            shouldUseMd3DockBackedCapsule ||
+            shouldUseMd3LiquidCapsule
         val shouldPrimeTopTabLiquidGlassCapture =
             isLiquidGlassEnabled &&
                 !skinPlainStyle &&
@@ -1338,7 +1341,7 @@ private fun LightweightHomeTopTabs(
                             renderer = effectiveRenderer,
                             skinPlainStyle = skinPlainStyle,
                             hasSkinStickerIcon = hasSkinStickerIcons
-                        )
+                        ) && !usesSharedCapsuleIndicator
                         val measuredItemModifier = if (shouldUseMovingIosCapsule && index == selectedIndex) {
                             Modifier.onGloballyPositioned { coordinates ->
                                 selectedItemLeftInWindowPx = coordinates.boundsInWindow().left
@@ -1371,6 +1374,11 @@ private fun LightweightHomeTopTabs(
                             skinPlainStyle = skinPlainStyle,
                             skinPlainContentColor = skinPlainContentColor,
                             drawContainer = drawItemContainer,
+                            usesSharedCapsuleIndicator = usesSharedCapsuleIndicator,
+                            liquidGlassEnabled = shouldUseLiquidGlassIndicator,
+                            indicatorPosition = topTabIndicatorPosition,
+                            motionProgress = topTabMotionProgress,
+                            selectionEmphasis = topTabRefractionMotionProfile.visibleSelectionEmphasis,
                             skinIconPaths = topTabSkinIconPaths[categoryKey.trim().uppercase()],
                             hasSkinStickerIcon = hasSkinStickerIcons,
                             useClickIndication = shouldUseLightweightTopTabItemClickIndication(
@@ -1513,6 +1521,11 @@ private fun LightweightTopTabItem(
     skinPlainStyle: Boolean = false,
     skinPlainContentColor: Color? = null,
     drawContainer: Boolean = true,
+    usesSharedCapsuleIndicator: Boolean = false,
+    liquidGlassEnabled: Boolean = false,
+    indicatorPosition: Float = 0f,
+    motionProgress: Float = 0f,
+    selectionEmphasis: Float = 1f,
     skinIconPaths: TopTabSkinIconPaths? = null,
     hasSkinStickerIcon: Boolean = false,
     useClickIndication: Boolean = true,
@@ -1547,11 +1560,28 @@ private fun LightweightTopTabItem(
     } else {
         colorScheme.onSurfaceVariant
     }
-    val contentColor = androidx.compose.ui.graphics.lerp(
-        unselectedColor,
-        selectedColor,
-        selectionFraction
-    )
+    val contentColor = if (usesSharedCapsuleIndicator && liquidGlassEnabled) {
+        val motionVisual = resolveBottomBarItemMotionVisual(
+            itemIndex = index,
+            indicatorPosition = indicatorPosition,
+            currentSelectedIndex = selectedIndex,
+            motionProgress = motionProgress,
+            selectionEmphasis = selectionEmphasis
+        )
+        resolveBottomBarGlassVisibleContentColor(
+            unselectedColor = unselectedColor,
+            selectedColor = selectedColor,
+            themeWeight = motionVisual.themeWeight,
+            glassEnabled = true,
+            indicatorProgress = motionProgress
+        )
+    } else {
+        androidx.compose.ui.graphics.lerp(
+            unselectedColor,
+            selectedColor,
+            selectionFraction
+        )
+    }
     val containerColor = when {
         !drawContainer -> Color.Transparent
         skinPlainStyle -> Color.Transparent
