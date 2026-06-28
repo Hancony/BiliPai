@@ -20,7 +20,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
@@ -324,21 +323,6 @@ private fun HomeHeroCarouselCard(
                         )
                     )
             )
-            // 时长标签
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
-                    .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(4.dp))
-                    .padding(horizontal = 6.dp, vertical = 2.dp)
-            ) {
-                Text(
-                    text = FormatUtils.formatDuration(video.duration),
-                    color = Color.White,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -364,11 +348,15 @@ private fun HomeHeroCarouselCard(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false)
                 )
-                if (video.stat.view > 0 || video.stat.danmaku > 0) {
-                    Spacer(modifier = Modifier.width(10.dp))
+                if (video.duration > 0 || video.stat.view > 0 || video.stat.danmaku > 0) {
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = buildString {
+                            if (video.duration > 0) {
+                                append(FormatUtils.formatDuration(video.duration))
+                            }
                             if (video.stat.view > 0) {
+                                if (isNotEmpty()) append(" · ")
                                 append(FormatUtils.formatStat(video.stat.view.toLong()))
                                 append("播放")
                             }
