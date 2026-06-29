@@ -94,11 +94,18 @@ private fun lightSiblingPopTransform(): ContentTransform {
 
 private fun disabledVideoDirectionReturnTransform(directionSign: Int): ContentTransform {
     return EnterTransition.None togetherWith
-        slideOutHorizontally(
-            animationSpec = tween(
-                durationMillis = NAV3_DISABLED_VIDEO_RETURN_MILLIS,
-                easing = AppMotionEasing.EmphasizedExit
-            ),
-            targetOffsetX = { width -> directionSign * width }
+        (
+            slideOutHorizontally(
+                animationSpec = tween(
+                    durationMillis = NAV3_DISABLED_VIDEO_RETURN_MILLIS,
+                    easing = AppMotionEasing.EmphasizedExit
+                ),
+                targetOffsetX = { width -> directionSign * width }
+            ) + fadeOut(
+                animationSpec = tween(
+                    durationMillis = NAV3_DISABLED_VIDEO_RETURN_MILLIS,
+                    easing = AppMotionEasing.EmphasizedExit
+                )
+            )
         )
 }

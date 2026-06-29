@@ -46,14 +46,17 @@ class BiliPaiNavContentTransformPolicyStructureTest {
     }
 
     @Test
-    fun disabledVideoDirectionalReturnAvoidsExtraFadeWork() {
+    fun disabledVideoDirectionalReturnFadesAlongsideSlide() {
         val source = contentTransformPolicySource()
         val returnFunctionStart = source.indexOf("private fun disabledVideoDirectionReturnTransform")
         val returnFunctionEnd = source.length
         val returnFunction = source.substring(returnFunctionStart, returnFunctionEnd)
 
-        assertTrue(returnFunction.contains("AppMotionEasing.EmphasizedExit"))
-        assertTrue(returnFunction.contains("fadeOut(").not())
+        assertTrue(returnFunction.contains("EnterTransition.None togetherWith"))
+        assertTrue(returnFunction.contains("ExitTransition.None").not())
+        // 与前向方向（slideIn + fadeIn togetherWith fadeOut）对称：
+        // 返回方向也应 fadeOut 退出页面，使入口/出口视觉效果一致。
+        assertTrue(returnFunction.contains("fadeOut("))
     }
 
     @Test
